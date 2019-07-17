@@ -1,6 +1,6 @@
-## BMP文件格式详解
+## BMP存储规则
 
-* 见维基百科<https://zh.wikipedia.org/wiki/BMP>
+* <https://zh.wikipedia.org/wiki/BMP>
 
 ## BMP示例
 
