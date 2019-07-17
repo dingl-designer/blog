@@ -1,6 +1,6 @@
 ## BMP文件存储格式
 
-<img src="./pic/bmp.png" alt="BMP示例" width="70%" style="float:left">
+<img src="./pic/bmp.png" alt="BMP示例" width="70%">
 
 ### Bitmap File Header部分
 
