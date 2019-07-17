@@ -1,4 +1,8 @@
-## BMP文件存储格式
+## BMP文件格式详解
+
+* 见维基百科<https://zh.wikipedia.org/wiki/BMP>
+
+## BMP示例
 
 <img src="./pic/bmp.png" alt="BMP示例" width="70%">
 
