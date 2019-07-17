@@ -2,11 +2,11 @@
 layout: default
 ---
 
-#### BMP文件存储格式
+## BMP文件存储格式
 
 ![BMP图片示例](.\pic\bmp.png)
 
-##### Bitmap File Header部分
+### Bitmap File Header部分
 
 ​	**1**> 0~1字节，文件类型，固定值0x4d42（BM）；
 
@@ -18,7 +18,7 @@ layout: default
 
 ​	**5**> 10~13字节，偏移量，可用于快速定位实际数据。示例为0x00000036（从第54字节开始）；
 
-##### Bitmap Info Header部分
+### Bitmap Info Header部分
 
 ​	**6**> 14~17字节，Bitmap Info Header部分所占大小，示例为0x00000028（40字节）；
 
@@ -42,11 +42,11 @@ layout: default
 
 ​	**16**> 50~53字节，对图像显示有重要影响的颜色索引数，示例为0x00000000（都有重要影响）；
 
-##### Color Palette（调色板）部分
+### Color Palette（调色板）部分
 
 ​	索引值和颜色映射表，大小为(15)*4字节，每4个字节为一组，分别存放R、G、B和Alpha分量，示例中未使用调色板；
 
-##### Bitmap Data部分
+### Bitmap Data部分
 
 ​	**17**> 54~ 字节，未压缩情况下，每(10)/8个字节存储一个像素的颜色信息。
 
