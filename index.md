@@ -1,6 +1,3 @@
----
-layout: default
----
 ### 多媒体文件存储格式
 
 #### 图像文件
@@ -14,6 +11,7 @@ layout: default
 ##### GIF
 
 
+
 #### 音频文件
 
 ##### MP3
@@ -23,6 +21,7 @@ layout: default
 ##### AAC
 
 ##### APE
+
 
 
 #### 视频文件
