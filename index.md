@@ -2,122 +2,55 @@
 layout: default
 ---
 
-Text can be **bold**, _italic_, ~~strikethrough~~ or `keyword`.
+#### BMP文件存储格式
 
-[Link to another page](./another-page.html).
+![BMP图片示例](.\pic\bmp.png)
 
-There should be whitespace between paragraphs.
+##### Bitmap File Header部分
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
+​	**1**> 0~1字节，文件类型，固定值0x4d42（BM）；
 
-# Header 01
+​	**2**> 2~5字节，文件大小，示例为0x00030036（文件大小192KB）；
 
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
+​	**3**> 6~7字节，保留字段1，一般使用默认值0x0000;
 
-## Header 2
+​	**4**> 8~9字节，保留字段2，一般使用默认值0x0000;
 
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
+​	**5**> 10~13字节，偏移量，可用于快速定位实际数据。示例为0x00000036（从第54字节开始）；
 
-### Header 3
+##### Bitmap Info Header部分
 
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
-```
+​	**6**> 14~17字节，Bitmap Info Header部分所占大小，示例为0x00000028（40字节）；
 
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
-```
+​	**7**> 18~21字节，图像宽度，单位像素，示例为0x00000100（256像素）；
 
-#### Header 4
+​	**8**> 22~25字节，图像高度，单位像素，示例为0x00000100（256像素）；
 
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
+​	**9**> 26~27字节，颜色平面数，一般为0x0001；
 
-##### Header 5
+​	**10**> 28~29字节，每像素占用比特数，可取值1、4、8、16、24、32，示例为0x0018（24比特/像素）；
 
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
+​	**11**> 30~33字节，数据压缩方式，可取值0、1、2、3、4、5，示例为0x00000000（未压缩）；
 
-###### Header 6
+​	**12**> 34~37字节，图像数据大小，如果上一个字段未使用压缩存储，可设置为0，示例为0x00030000（192KB）;注意与字段2区分，在未压缩情况下，(2)=(5)+(12)；
 
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
+​	**13**> 38~41字节，水平分辨率，示例为0x00000ece（3790像素/米）；
 
-### There's a horizontal rule below this.
+​	**14**> 42~45字节，垂直分辨率，示例为0x00000ece（3780像素/米）；
 
-* * *
+​	**15**> 46~49字节，使用到的彩色表中的颜色索引数，示例为0x00000000（使用所有）；
 
-### Here is an unordered list:
+​	**16**> 50~53字节，对图像显示有重要影响的颜色索引数，示例为0x00000000（都有重要影响）；
 
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
+##### Color Palette（调色板）部分
 
-### And an ordered list:
+​	索引值和颜色映射表，大小为(15)*4字节，每4个字节为一组，分别存放R、G、B和Alpha分量，示例中未使用调色板；
 
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
+##### Bitmap Data部分
 
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Small image
-
-![Octocat](https://github.githubassets.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![Branching](https://guides.github.com/activities/hello-world/branching.png)
+​	**17**> 54~ 字节，未压缩情况下，每(10)/8个字节存储一个像素的颜色信息。
 
 
-### Definition lists can be used with HTML syntax.
 
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
 
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
-```
 
-```
-The final element.
-```
