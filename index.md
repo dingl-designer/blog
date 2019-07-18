@@ -3,6 +3,4 @@
 * [BMP](./nulti-media/BMP.html)
 * [GIF](https://en.wikipedia.org/wiki/GIF) 
 * [JPEG](https://en.wikipedia.org/wiki/JPEG)
-
 * [TIFF](https://en.wikipedia.org/wiki/TIFF)
-
