@@ -20,7 +20,7 @@
 
 ### Bitmap Information Header
 
-​	**6**> 14~17字节，Bitmap Info Header部分所占大小，示例为0x00000028（40字节）；
+​	**6**> 14~17字节，Bitmap Information Header部分所占大小，示例为0x00000028（40字节）；
 
 ​	**7**> 18~21字节，图像宽度，单位像素，示例为0x00000100（256像素）；
 
