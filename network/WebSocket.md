@@ -1,6 +1,6 @@
-#### 使用WebSocket实现长连接
+### 使用WebSocket实现长连接
 
-##### 写在前面
+#### 写在前面
 
 * Java版的WebSocket不是JavaSE中实现的，而是在JavaEE、Jetty、Tomcat等容器中实现的，如 %TOMCAT_HOME%\lib\websocket-api.jar；
 
@@ -17,11 +17,11 @@
 
 * [官方文档](https://docs.oracle.com/javaee/7/tutorial/websocket001.htm)
 
-##### 基础版
+#### 基础版
 
 * 连接建立后，客户端与服务端进行持续的信息交互
 
-###### 服务端
+##### 服务端
 
 ```java
 import javax.websocket.*;
@@ -55,7 +55,7 @@ public class MyEndpoint {
 }
 ```
 
-###### 客户端
+##### 客户端
 
 ```html
 <button onclick="javascript:send()">send</button>
@@ -82,13 +82,13 @@ function send() {
 
 
 
-##### 聊天室版
+#### 聊天室版
 
 * 客户端向服务端发送消息，服务端将消息转发给其他客户端
 * SessionHolder类用于保存所有在线客户端信息，究其原因，在低版本Tomcat中`session.getOpenSessions()`可用于获取所有在线客户端，但是在高版本中不支持
 * 客户端代码同上，服务端代码如下
 
-###### 	服务端
+##### 服务端
 
 ```java
 import javax.websocket.Session;
