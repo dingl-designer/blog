@@ -1,16 +1,16 @@
-## PNG存储规则
+### PNG存储规则
 
 * <https://en.wikipedia.org/wiki/Portable_Network_Graphics>
 
-## PNG示例
+### PNG示例
 
 <img src="./pic/png.png" alt="BMP示例" width="70%">
 
-### File Header
+#### File Header
 
 ​	**1**> 0~7字节，类型签名，0x504e47（PNG）；
 
-### IHDR Chunk
+#### IHDR Chunk
 
 ​	**2**> 8~11字节，chunk data length，chunk data (4)、(5)、(6) 的总长度，示例为0x0000000d（13字节）；
 
@@ -24,7 +24,7 @@
 
 ​	**7**> 29~32字节，(3)、(4)、(5)、(6)的CRC校验值；
 
-### bKGD Chunk
+#### bKGD Chunk
 
 ​	**8**> 33~36字节，chunk data length，示例为0x00000006（6字节）；
 
@@ -34,7 +34,7 @@
 
 ​	**11**> 47~50字节，(9)、(10)的CRC校验值；
 
-### pHYs Chunk
+#### pHYs Chunk
 
 ​	**12**> 50~53字节，chunk data length，示例为0x00000009（9字节）；
 
@@ -44,7 +44,7 @@
 
 ​	**15**> 68~71字节，(13)、(14)的CRC校验值；
 
-### IDAT Chunk
+#### IDAT Chunk
 
 ​	**16**> 72~75字节，chunk data length，示例为0x00002000（8192字节）；
 

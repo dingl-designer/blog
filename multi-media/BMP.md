@@ -1,12 +1,12 @@
-## BMP存储规则
+### BMP存储规则
 
 * <https://en.wikipedia.org/wiki/BMP_file_format>
 
-## BMP示例
+### BMP示例
 
 <img src="./pic/bmp.png" alt="BMP示例" width="70%">
 
-### Bitmap File Header
+#### Bitmap File Header
 
 ​	**1**> 0~1字节，文件类型，固定值0x4d42（BM）；
 
@@ -18,7 +18,7 @@
 
 ​	**5**> 10~13字节，偏移量，可用于快速定位实际数据。示例为0x00000036（从第54字节开始）；
 
-### Bitmap Information Header
+#### Bitmap Information Header
 
 ​	**6**> 14~17字节，Bitmap Information Header部分所占大小，示例为0x00000028（40字节）；
 
@@ -42,11 +42,11 @@
 
 ​	**16**> 50~53字节，对图像显示有重要影响的颜色索引数，示例为0x00000000（都有重要影响）；
 
-### Color table
+#### Color table
 
 ​	索引值和颜色映射表，大小为(15)*4字节，每4个字节为一组，分别存放R、G、B和Alpha分量，示例中未使用调色板；
 
-### Pixel storage
+#### Pixel storage
 
 ​	**17**> 54~ 字节，未压缩情况下，每(10)/8个字节存储一个像素的颜色信息。
 
