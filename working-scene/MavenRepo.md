@@ -18,14 +18,15 @@
 
 * 当前用户下新建nexus/目录，[下载](https://help.sonatype.com/repomanager3/download)最新版二进制压缩包（nexus-3.17.0-01-unix.tar.gz）到nexus/，解压得到nexus-3.17.0-01/和snoatype-work/
 * 执行./nexus-3.17.0-01/bin/nexus start启动服务。使用./nexus-3.17.0-01/bin/nexus查看指令提示。
-* 访问ip:8081进入管理界面，点击Sign in，用户名admin，密码在sonatype-work/nexus3/admin.password中。首次登陆在引导设置中将密码置为admin123，并勾选anonymous access（允许匿名访问）。
+* 访问ip:8081进入管理界面，点击Sign in，用户名admin，密码在sonatype-work/nexus3/admin.password中。首次登陆在引导设置中将密码置为admin123，并勾选anonymous access（允许匿名检索，不允许匿名发布）。
 * Nexus默认创建了：两个仓库分组（maven-public和nuget-group），两个代理仓库（maven-central和nuget.org-proxy），三个主机仓库（maven-releases、maven-snapshots和nuget-hosted）。前缀`nuget-`的表示供.NET语言使用，`maven-`前缀为Java语言使用。
 * 仓库分组的作用是将组内的多个仓库地址统一到同一个分组地址。
-* 代理仓库可看作是远程仓库在本主机上的缓存。一般来讲，获取阿里仓库的资源要比国外的资源更快，所以最好为阿里仓库创建一个代理仓库alicloud-proxy，仓库类型maven2(proxy)，代理地址<https://maven.aliyun.com/repository/public>，并添加到maven-public分组，maven-central之前。
+* 代理仓库可看作是远程仓库在本主机上的缓存。理论上，获取阿里仓库的资源要比国外的资源更快，所以最好为阿里仓库创建一个代理仓库alicloud-proxy，仓库类型maven2(proxy)，代理地址<https://maven.aliyun.com/repository/public>，并添加到maven-public分组，maven-central之前。
 
 #### 开发者配置
 
 - Maven项目的仓库信息可以在三个层次上进行定义：工程级别，in the project POM file（pom.xml）；用户级别，in Maven settings xml file（%USER_HOME%/.m2/settings.xml）；全局级别，in Maven global settings xml file（%M2_HOME%/conf/settings.xml）。覆盖范围越广，优先级越低。
+- 实际开发过程中，虽然可能存在多个settings.xml文件，但是只有配置到IDE中的那个settings.xml文件才生效。
 
 ##### 检索配置
 
@@ -80,3 +81,7 @@
       </snapshotRepository>
   </distributionManagement>
   ```
+
+##### 其他
+
+* 测试过程中遇到的问题：Mac版idea选择配置maven时，在Preferences菜单下配置生效，在Default settings菜单下配置不生效（差点被烦死）。
