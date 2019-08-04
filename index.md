@@ -4,3 +4,5 @@
 
 #### [工作场景](./working-scene/index.html)
 
+#### [Computer Graphics](./gc/index.html)
+
