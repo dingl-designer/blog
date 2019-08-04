@@ -2,15 +2,15 @@
 
 1、下载系统镜像IOS
 
-https://ubuntu.com/download/desktop
+<https://ubuntu.com/download/desktop>
 
 2、（Windows下）使用Rufus制作启动盘
 
-官方教程https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-windows?_ga=2.146803703.1584177293.1560691945-887382654.1560255339#0
+官方教程<https://tutorials.ubuntu.com/tutorial/tutorial-create-a-usb-stick-on-windows?_ga=2.146803703.1584177293.1560691945-887382654.1560255339#0>
 
 3、（朴赛组装机）从U盘启动安装
 
-官方教程https://tutorials.ubuntu.com/tutorial/tutorial-install-ubuntu-desktop#0
+官方教程<https://tutorials.ubuntu.com/tutorial/tutorial-install-ubuntu-desktop#0>
 
 3.1、按DELETE进入BIOS，第一启动项设置为UEFI USB Key : UEFI : USB Name
 
@@ -42,11 +42,9 @@ https://ubuntu.com/download/desktop
 
 $lspci | grep -i nvidia
 
-2、查看N卡驱动：
+2、查看N卡驱动，此时未装N卡驱动，会提示not found：
 
 $nvidia-smi -a
-
-‘not found’
 
 3、打开应用程序里的软件和更新（不是软件更新器），附加驱动，显示GTX 1080 Ti有两个驱动可用，默认第二个通用驱动，改为第一个Nvidia专用驱动。安装完成后需要重启计算机，之后可以用上一步命令验证一下。
 
@@ -74,7 +72,7 @@ Unable to get location from provider.
 
 问题二：屏幕亮度无法调节
 
-根据教程https://blog.csdn.net/lingyunxianhe/article/details/81116157进行设置
+根据教程<https://blog.csdn.net/lingyunxianhe/article/details/81116157>进行设置
 
 1、brightness-controller是一个GitHub上的开源软件，添加源并安装
 
@@ -104,9 +102,9 @@ $brightness-controller-simple
 
 #### NeHe教程源码下载
 
-NeHe的OpenGL教程很出名，而且有源码，无需修改或做少量改动就可以编译使用，我fork了一份，这份仓库里有多种语言的实现，/linux文件夹下是cpp版的https://github.com/dingl-designer/nehe-opengl/tree/master/linux
+NeHe的OpenGL教程很出名，而且有源码，无需修改或做少量改动就可以编译使用，我fork了一份，这份仓库里有多种语言的实现，/linux文件夹下是cpp版的<https://github.com/dingl-designer/nehe-opengl/tree/master/linux>
 
-1、根据官方教程配置git：https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
+1、安装git，官方教程<https://git-scm.com/book/en/v2/Getting-Started-Installing-Git>
 
 $sudo apt install git-all
 
@@ -128,7 +126,7 @@ $git clone https://github.com/dingl-designer/nehe-opengl.git
 
 #### C/C++版OPENGL环境配置
 
-按照Linux公社教程操作：https://www.linuxidc.com/Linux/2017-03/141555.htm
+按照Linux公社教程操作：<https://www.linuxidc.com/Linux/2017-03/141555.htm>
 
 1、安装编译器和基本的函数库
 
