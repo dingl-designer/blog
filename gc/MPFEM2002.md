@@ -44,4 +44,47 @@ u_i&=g_i \:\:on \:\:\Gamma_g		\tag{1b}\\
 \end{align}
 $$
 
+​	在（1）中，$\sigma_{ij}=C_{ijkl}\epsilon_{kl}=C_{ijkl}u_{(k,l)}$是Cauchy应力张量，其中$(k,l)$表示应变的对称部分，$f_i$是每单位体积的体力，$\epsilon_{kl}$是应变张量，$C_{ijkl}$是 弹性系数，$h_i$是边界牵引力，$g_i$规定的边界位移，$\Gamma_h$自然边界和$\Gamma_g$的基础边界。 变量后面的逗号（在哪？）表示关于指示的空间变量的偏导数。
+
+​	乘以测试函数$\delta u_i$并按部分执行积分，得到以下弱公式：
+$$
+\int_\Omega\delta u_{(i,j)}C_{ijkl}u_{(k,l)}\mathrm{d\Omega}=\int_\Omega\delta u_if_i\mathrm{d\Omega}+\int_{\Gamma_{h_i}}\delta u_ih_i\mathrm{d\Gamma_{h_i}}	\tag{2}
+$$
+对于上面中给出的弱形式（2），左手项近似为
+$$
+\int_\Omega\delta u_{i}C_{ijkl}u_{(k,l)}\mathrm{d\Omega}\approx\delta 
+\mathrm{u^TKu}		\tag{3}
+$$
+其中$\delta\mathrm{u}$和$\mathrm{u}$分别是试验函数和离散位移矢量。 刚性矩阵$\mathrm{K}$近似为
+$$
+\mathrm{K}=\int_\Omega\mathrm{B^TCBd\Omega}\approx\sum_{I=1}^{NP}
+\mathrm{B^T}(X_I)\mathrm{CB}(X_I)\Delta V_I		\tag{4}
+$$
+其中$\mathrm{NP}$是粒子数且$\Delta V_I$是与每个粒子相关的整合重量（或者翻译为积分权重？）。 特别要注意的是粒子等同于FEM公式中的节点。
+
+​	类似地，（2）中的第二项，即体力项，近似为
+$$
+\int_\Omega\delta u_if_i\mathrm{d\Omega} \approx\sum_{I=1}^{\mathrm{NP}}\mathrm{N^T}(X_I)\mathrm{f}(X_I)\Delta V_I		\tag{5}
+$$
+（2）中的最后一项，牵引力项，近似为
+$$
+\int_{\Gamma_{h_i}}\delta u_ih_i\mathrm{d\Gamma_{h_i}} \approx\sum_{I=1}^{\mathrm{NB}}\mathrm{N^T}(X_I)\mathrm{h}(X_I)\Delta S_I		\tag{6}
+$$
+其中$\mathrm{NB}$是域的自然边界上的粒子数且$\Delta S_I$是和每一个边界粒子相关的整合重量。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
