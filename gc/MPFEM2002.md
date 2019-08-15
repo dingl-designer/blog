@@ -1,6 +1,6 @@
-*注*：[原文链接](./MPFEM.pdf)
+*注*：1 [原文链接](./MPFEM.pdf)
 
-
+2 文中直体的 $\mathrm x$ 含义待确认。文中出现的$x 和 y$严格来说不是指坐标轴，而是指形函数中的自变量$x和y$。
 
 *名词解释*：
 
@@ -158,7 +158,7 @@ $$
 $$
 \sum_IN_I(\mathrm x_G)x_I=x_G		\tag{16}
 $$
-上式说明提出的近似值（是指 $1$吧）能够在 $x$轴方向上内准确再现线性场。类似的计算可以证明再现条件在 $y$轴方向也满足要求。
+上式说明提出的近似值（是指 $1$吧）能够在 $x$上内准确再现线性场。类似的计算可以证明再现条件在 $y$上也满足要求。
 
 ​	以类似的方式来实现形函数导数的再现条件推导。考虑如下形式的近似值
 $$
@@ -316,9 +316,179 @@ $$
 
 ​	在上文中，MPFEM5元素首先被分解为四个三角形，如图5（b）所示。 这样做是因为已知三角形单元的  $\mathrm W$矩阵不是单数的，除非三个点位于一条直线上。 然后，对于每个三角形，求解与（29b）和（29c）相同的一组方程，得到在点 $5$ 处每个三角形的每个点的$x$-和$y$-导数。这确保满足了常数和线性导数的再现条件。 因此，$\mathrm Q$是点 $5$ 处四个三角形的导数的简单平均。
 
+##### 4.2 $x$-导数
+
+​	然而，尚未施加显性或二次再现条件。对于$x$-导数，必须求解下面的方程，这个方程给出了（34）中$\eta$的值
+$$
+\left[\begin{matrix}\eta_1\\\eta_2\end{matrix}\right]=
+\left[\begin{matrix}\alpha_1&\alpha_2\\\alpha_3&\alpha_4\end{matrix}\right]^{-1}
+\left[\begin{matrix}1\\0\end{matrix}\right]		\tag{36a,b}
+$$
+其中
+$$
+\begin{align}
+\alpha_1&=\sum_IN_{IA}^x(\mathrm x_I-\mathrm x_5)+
+\sum_JN_{JB}^x(\mathrm x_J-\mathrm x_5)		\tag{37a}\\
+\alpha_2&=\sum_IN_{IC}^x(\mathrm x_I-\mathrm x_5)+
+\sum_JN_{JD}^x(\mathrm x_J-\mathrm x_5)		\tag{37b}\\
+\alpha_3&=\sum_IN_{IA}^x(\mathrm x_I-\mathrm x_5)^2+
+\sum_JN_{JB}^x(\mathrm x_J-\mathrm x_5)^2		\tag{37c}\\
+\alpha_4&=\sum_IN_{IC}^x(\mathrm x_I-\mathrm x_5)^2+
+\sum_JN_{JD}^x(\mathrm x_J-\mathrm x_5)^2		\tag{37b}
+\end{align}
+$$
+如（37a）和（37b）中那样施加线性再现条件导出等式（36a），如（37c）和（37d）中那样施加二次再现条件导出（36b）。
+
+​	从上面可以看出，$\eta $代表了粒子离散化的几何不规则性。 如果网格是规则的，$\eta_1=\eta_2=\frac{1}{4}$，并且点5的形函数导数是包括该点的三角形的$x$-导数的平均值。 对于这种情况，$\mathrm R$和$\mathrm S$项对微分近似没有贡献。 因此，（34）中的第一项可以被认为是满足常数再现条件的项。 如果网格不规则，$\eta_1\ne\frac{1}{4},\eta_2\ne\frac{1}{4}$，（34）中的$\mathrm R$ 和$\mathrm S$ 向量不再为零。 因此，这些项可以被认为是满足线性和二次再现条件的项。
+
+​	现在让我们通过求逆$\mathrm W$ 矩阵并乘以适当的再现向量来证明（34）的等价性，以获得形函数导数（对于规则间距）。 考虑粒子5的MPFEM5元素，如图5（a）所示。 将均匀网格间距定义为$\Delta $。通过求解方程组来计算$x$-导数
+$$
+\mathrm N^x(\mathrm x_5)=\mathrm W^{-1}\mathrm P^x(0)		\tag{38a}
+$$
+其中
+$$
+\begin{align}
+\mathrm W^{-1}&=\left[\begin{matrix}
+1&1&1&1&1\\
+-\Delta&0&\Delta&0&0\\
+0&-\Delta&0&\Delta&0\\
+\Delta^2&0&\Delta^2&0&0\\
+0&\Delta^2&0&\Delta^2&0
+\end{matrix}\right]^{-1}		\tag{38b}\\
+\mathrm P^x(0)^{\mathrm T}&=[0,1,0,0,0]		\tag{38c}
+\end{align}
+$$
+对于这样的均匀间隔配置，
+$$
+\mathrm N^x(\mathrm x_5)^{\mathrm T}=[-\frac{1}{2\Delta},0,\frac{1}{2\Delta},0,0]		\tag{39}
+$$
+
+
+应用上面描述的理论，如图4（b），MPFEM5元素首先被分解成四个三角形，这四个三角形展示如下
+$$
+\begin{align}
+N_A^x(\mathrm x_5)^{\mathrm T}=[-\frac{1}{\Delta},0,0,0,\frac{1}{\Delta}]		\tag{40a}\\
+N_B^x(\mathrm x_5)^{\mathrm T}=[-\frac{1}{\Delta},0,0,0,\frac{1}{\Delta}]		\tag{40b}\\
+N_C^x(\mathrm x_5)^{\mathrm T}=[0,0,\frac{1}{\Delta},0,-\frac{1}{\Delta}]		\tag{40c}\\
+N_D^x(\mathrm x_5)^{\mathrm T}=[0,0,\frac{1}{\Delta},0,-\frac{1}{\Delta}]		\tag{40d}\\
+\end{align}
+$$
+有了这些结果并利用（34）很容易证明，在均匀间隔情形下，（34）的结果等价于（39）。
+
+​	为了完整性，应该注意MPFEM5形函数满足克罗内克$\delta$ 属性。 这可以通过在（38b）中求逆$\mathrm W$并乘以适当的再现向量来证明。 生成的形函数在点$\mathrm x_5$处具有克罗内克$\delta$ 属性。
+
+##### 4.3 $y$-导数
+
+​	对于 $y$-导数，一个几乎与 $x$-导数相同的计算过程将在下面给出。首先，$y$-导数可以写作
+$$
+\mathrm N^y(\mathrm x_5)=\frac{1}{4}(\mathrm Q)+(\eta_1-\frac{1}{4})(\mathrm R)+(\eta_2-\frac{1}{4})(\mathrm S)		\tag{41}
+$$
+其中
+$$
+\begin{align}
+\mathrm Q&=\left[\begin{matrix}
+N_{1A}^y(\mathrm x_5)\\0\\0\\N_{4A}^y(\mathrm x_5) \\N_{5A}^y(\mathrm x_5)
+\end{matrix}\right]+
+\left[\begin{matrix}
+N_{1B}^y(\mathrm x_5)\\N_{2B}^y(\mathrm x_5)\\0\\0 \\N_{5B}^y(\mathrm x_5)
+\end{matrix}\right]+
+\left[\begin{matrix}
+0\\N_{2C}^y(\mathrm x_5)\\N_{3C}^y(\mathrm x_5)\\0 \\N_{5C}^y(\mathrm x_5)
+\end{matrix}\right]+
+\left[\begin{matrix}
+0\\0\\N_{3D}^y(\mathrm x_5)\\N_{4D}^y(\mathrm x_5) \\N_{5D}^y(\mathrm x_5)
+\end{matrix}\right]		\tag{42a}\\
+\mathrm R&=\left[\begin{matrix}
+N_{1A}^y(\mathrm x_5)\\0\\0\\N_{4A}^y(\mathrm x_5) \\N_{5A}^y(\mathrm x_5)
+\end{matrix}\right]+
+\left[\begin{matrix}
+0\\N_{2C}^y(\mathrm x_5)\\N_{3C}^y(\mathrm x_5)\\0 \\N_{5C}^y(\mathrm x_5)
+\end{matrix}\right]		\tag{42b}\\
+\mathrm S&=\left[\begin{matrix}
+N_{1B}^y(\mathrm x_5)\\N_{2B}^y(\mathrm x_5)\\0\\0 \\N_{5B}^y(\mathrm x_5)
+\end{matrix}\right]+
+\left[\begin{matrix}
+0\\0\\N_{3D}^y(\mathrm x_5)\\N_{4D}^y(\mathrm x_5) \\N_{5D}^y(\mathrm x_5)
+\end{matrix}\right]		\tag{42c}
+\end{align}
+$$
+​	注意上面的等式与（34）和（35）的相似性，区别在于不同的三角形分组；三角形 $\mathrm A$和$\mathrm C$ 组合在一起，三角形 $\mathrm B$ 和 $\mathrm D$组合在一起。同样，尚未满足更高阶的再现条件。在这种情况下，施加了$y$上的线性和二次再现条件。 对应于（36）和（37）的等式是
+
+$$
+\left[\begin{matrix}\eta_1\\\eta_2\end{matrix}\right]=
+\left[\begin{matrix}\alpha_1&\alpha_2\\\alpha_3&\alpha_4\end{matrix}\right]^{-1}
+\left[\begin{matrix}1\\0\end{matrix}\right]		\tag{43}
+$$
+其中
+$$
+\begin{align}
+\alpha_1&=\sum_IN_{IA}^y(\mathrm y_I-\mathrm y_5)+
+\sum_JN_{JC}^y(\mathrm y_J-\mathrm y_5)		\tag{44a}\\
+\alpha_2&=\sum_IN_{IB}^y(\mathrm y_I-\mathrm y_5)+
+\sum_JN_{JD}^y(\mathrm y_J-\mathrm y_5)		\tag{44b}\\
+\alpha_3&=\sum_IN_{IA}^y(\mathrm y_I-\mathrm y_5)^2+
+\sum_JN_{JC}^y(\mathrm y_J-\mathrm y_5)^2		\tag{44c}\\
+\alpha_4&=\sum_IN_{IB}^y(\mathrm y_I-\mathrm y_5)^2+
+\sum_JN_{JD}^y(\mathrm y_J-\mathrm y_5)^2		\tag{44b}
+\end{align}
+$$
+
+##### 4.4 边界处理
+
+​	使用MPFEM5元素时需要注意的一个事实是，边界粒子将经历与内部粒子不同的离散化。 这是因为不可能为边界粒子形成MPFEM5元素。 因此，为边界粒子构造了4粒子四边形单元。 构造边界四边形用以再现$x$和$y$上的常数线性场，以及$x$或$y$上的二次场。 选择二次场是为了确保 $\mathrm W $ 矩阵是可逆的。 与第3.3节中所示的边界元素一样，这个4粒子四边形可以被证明保留了克罗内克属性，以确保基本边界条件的简单实施。 4粒子四边形如图6所示。
+
+​	规则边界的特殊情况涉及角粒子。 对于这些情况，如果有人尝试再现二次场，会发现  $ \mathrm W$矩阵是单数的。 针对这种特殊情况再现的是常数场，$x$和$y$上的线性场，以及$xy$上的双线性场。
 
 
 
+#### 5 数值样例
+
+##### 5.1 剪切加载束
+
+​	在本节中，MPFEM5元件用于解决在其自由端受到剪切加载束的问题。详细的问题陈述是
+
+位移：
+$$
+u_1(0,0)=u_2(0,0)=0,\quad{u_1(0,\pm c)=0}		\tag{45a}
+$$
+牵引力：
+$$
+\begin{align}
+t_1(x,\pm c)&=t_2(x,\pm c)=0,\quad x\in(0,L)		\tag{45b}\\
+t_1(L,y)&=0,\quad y\in(-c,c)		\tag{45c}\\
+t_2(L,y)&=\frac{P(c^2-y^2)}{2I},\quad y\in(-c,c)		\tag{45d}\\
+t_1(0,y)&=\frac{PLy}{I},\quad y\in(-c,0)\cup(0,c)		\tag{45e}\\
+t_2(0,y)&=\frac{-P(c^2-y^2)}{2I},\quad y\in(-c,0)\cup(0,c)		\tag{45f}
+\end{align}
+$$
+$P$ 是常量，$c=D/2$，且惯性矩$I$由下式给出
+$$
+I=\frac{2c^3}{3}		\tag{45g}
+$$
+问题的精确解由下面的式子给出：
+$$
+\begin{align}
+\sigma_{11}&=\frac{-P(L-x)y}{I},\quad\sigma_{22}=0,\quad \sigma_{12}=\frac{P(c^2-y^2)}{2I}		\tag{45h}\\
+u_1&=\frac{-Py}{6\tilde EI}\left((6L-3x)x+(2+\tilde v)\left(y^2-\frac{D^2}{4}\right)\right)		\tag{45i}\\
+u_2&=\frac{P}{6\tilde EI}\left(3\tilde vy^2(L-x)+(4+5\tilde v)\frac{D^2x}{4}+(3L-x)x^2\right)		\tag{45j}
+\end{align}
+$$
+对于平面应变，
+$$
+\tilde v=\frac{v}{1-v}\quad 且 \quad \tilde E=\frac{E}{1-v^2}	\tag{45k}
+$$
+其中， $P=-1,D=2,L=10,E=2000$ 且$v=0.3和0.4999$。控制方程和弱形式和第2部分给出的相同（见图7）。
+
+##### 5.2 数值结果
+
+​	为了评估解决方案中的误差，我们使用如下位移误差范式：
+$$
+\|u-u^h\|=\frac{\sum_{I=1}^\mathrm{NP}(\mathrm u_I-\mathrm u_I^h)\cdot(\mathrm u_I-\mathrm u_I^h)}
+{\sum_{J=1}^{\mathrm{NP}}(\mathrm u_J\cdot\mathrm u_J)}		\tag{46}
+$$
+在上式中，$\mathrm u$是精确解且 $u^h$是近似解。
+
+​	讨论数值结果之前，我们首先阐明这个问题中使用的位移误差的定义。
 
 
 
