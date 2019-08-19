@@ -2,6 +2,108 @@
 
 [The Nature of Code示例代码](https://github.com/nature-of-code/noc-examples-processing)
 
+
+
+#### 0 Introduction
+
+0.2
+
+* `random()`是一个伪随机（pseudo-random）方法模拟的随机函数，[用法](https://processing.org/reference/random_.html)：
+
+  ```
+  float f1 = random(4);	//获取[0,4)的随机值
+  float f2 = random(-1,1);	//获取[-1,1)的随机值
+  ```
+
+0.4
+
+* `random`获取的随机值是平均分布的，现实中常用到正态分布（或叫高斯分布）；
+
+* 高斯分布由两个特征值决定，平均值（mean）$\mu$和标准差（standard deviation）$\sigma$。根据两个数值可以得出：68%的成员分布在距离平均值一个标准差的范围内，98%的成员分布在两个标准差范围内，99.7%分布在三个以内。
+
+  示例代码：
+
+  ```
+  Random generator = new Random();
+  float num = (float)generator.nextGaussian();	//nextGaussian返回double
+  float sd = 60;
+  float mean = 320;
+  float x = num*sd+mean;	//x是得到的高斯分布值
+  ```
+
+0.5
+
+* 一个获取自定义分布（Custom Distribution）随机值的方法：蒙特卡罗方法（Monte Carlo method）。该方法实现了随机值越大，被选择的概率就越大的线性分布。
+
+  ```java
+  float montecarlo() {
+    //We do this “forever” until we find a qualifying random value.
+    while (true) {
+  	//Pick a random value.
+      float r1 = random(1);
+  	//Assign a probability.
+      float probability = r1;
+  	//Pick a second random value.
+      float r2 = random(1);
+  	//Does it qualify? If so, we’re done!
+      if (r2 < probability) {
+        return r1;
+      }
+    }
+  }
+  ```
+
+0.6
+
+* 佩林噪音（Perlin Noise），可以生成平滑的随机值，更符合自然界的特征。
+
+* 一维的佩林噪音可以看做**关于时间的平滑曲线**，所以通过改变时间参数，可以得到不同的值（如果时间参数不变，就会得到相同的值）；时间跨度小，随机值就越平滑，时间跨度大，得到的随机值就震荡。
+
+  ```java
+  float time = 0;
+  void draw() {
+    float n = noise(time);
+    println(n);
+    // Now, we move forward in time!
+    time += 0.01;	//如果t不变，会一直打印同一个值
+  }
+  ```
+
+* 使用不同的`time`参数区间，可以得到相互独立的随机值序列。
+
+* 上面生成的随机值总是在[0,1)区间，使用`map(value,current min,current max,new min,new max)`映射到我们想要的区间，比如`noise(t)`生成了随机值0.3，把它映射到[1,10)：`float x=map(0.3,0,1,0,10);`。
+
+* 参数`time`只是佩林噪音的一种理解，参数还可以理解为`x`轴偏移。后一种理解方式方便把佩林噪音扩展到二维。
+
+* 二维噪音`noise(xoff,yoff)`，三维噪音`noise(xoff,yoff,zoff)`，`noiseDetail(lod, falloff)`可调节噪音的细节。[详见API，我是没看懂](https://processing.org/reference/noiseDetail_.html)
+
+* Exc_I_9和Exc_I_10的代码，哇！
+
+  其中从Exc_I_9的`draw()`函数中截取的渲染像素的部分（在该函数中，窗口大小`height,width`可以直接获取）：
+
+  ```java
+  loadPixels();
+  float bright = 100;
+  for (int x = 0; x < width; x++) {
+    for (int y = 0; y < height; y++) {
+      pixels[x+y*width] = color(bright,bright,bright);
+    }
+  }
+  updatePixels();
+  ```
+
+  从Exc_I_10中截取的在三维中画四边形（不是矩形）的代码：
+
+  ```java
+  beginShape(QUADS);
+  translate(x*scl-w/2, y*scl-h/2, 0);
+  vertex(0, 0, z[x][y]);
+  vertex(scl, 0, z[x+1][y]);
+  vertex(scl, scl, z[x+1][y+1]);
+  vertex(0, scl, z[x][y+1]);
+  endShape();
+  ```
+
 #### 1 Vectors
 
 1.1
@@ -103,7 +205,7 @@
 
   在Processing中，假设所有物体质量为1，在物体上施加力的方法为：
 
-  ```
+  ```java
   mover.applyForce(gravity);
   void applyForce(PVector force){
   	acceleration = force;
@@ -114,7 +216,7 @@
 
 * 2.2中`acceleration = force;`导致调用`applyForce`多次，只有最后一次生效，前面的力会被覆盖，所以优化如下：
 
-  ```
+  ```java
   void applyForce(PVector force){
   	acceleration.add(force);
   }
@@ -126,7 +228,7 @@
 
   记得在`update()`中重置加速度：
 
-  ```
+  ```java
   void update(){
   	velocity.add(acceleration);
   	location.add(velocity);
@@ -140,7 +242,7 @@
 
 * 在计算加速度时，因为作用力可能施加在多个物体上，为了使力向量能够复用，要使用向量的静态方法：
 
-  ```
+  ```java
   void applyForce(PVector force){
   	//force.div(mass); 错误写法
   	PVector f = PVector.div(force, mass);		//正确写法；也可先复制力向量（force.get()），使用复制的值参加计算
@@ -158,7 +260,7 @@
 
 * 上一节的例子的问题在于，物体越小，下降地越快（因为重力初始化为常量）。在现实中“两个铁球同时落地”。代码做一下修改
 
-  ```
+  ```java
   for (int i = 0; i < movers.length; i++) {
     PVector wind = new PVector(0.001,0);
     float m = movers[i].mass;
@@ -184,7 +286,7 @@
 
 * 2.6给出的公式中，$\mu$代表摩擦系数，$N$代表摩擦表面的法向作用力（比如高速路上飞奔的汽车，法向力即车的重力）。在Processing中，计算摩擦力分三步，计算标量部分、计算向量部分、整合：
 
-  ```
+  ```java
   float c = 0.01;
   float normal = 1;
   float frictionMag = c*normal;	//标量计算完毕
@@ -208,7 +310,7 @@
 
   示例代码：
 
-  ```
+  ```java
   PVector force = PVector.sub(location1,location2);
   float distance = force.magnitude();
   float m = (G*mass1*mass2)/(distance*distance);
@@ -225,7 +327,7 @@
 
 * 个人认为代码有一点可以改进：物体之间的作用力时同时发生的，所以更新位移的`update`方法应该在所有物体的作用力计算完成之后再调用。更改如下：
 
-  ```
+  ```java
   void draw() {
     background(255);
     for (int i = 0; i < movers.length; i++) {
@@ -246,6 +348,13 @@
   使用更改后的代码，能够使所有物体保持在可视窗体内（原代码使得物体很快逃逸出当前窗体）。
 
 
+
+#### 3 震荡
+
+3.1
+
+* 在Processing中，函数接收参数为弧度，使用角度思考，使用弧度写代码的方式为：`float angle = radians(60);rotate(angle)`.
+* 
 
 
 
