@@ -104,6 +104,8 @@
   endShape();
   ```
 
+  *注*：Processing程序主入口两个默认函数：$setup()$用于初始化变量，比如窗口大小和一些其他自定义常量；`draw()`用于渲染，该函数每执行一次，相当于窗口刷新一次。刷新频率不固定，即没有时钟的概念，每次渲染耗时越短，渲染频率就越高。所以即使同样的代码，在不同性能的机器上也会呈现不同的效果。
+
 #### 1 Vectors
 
 1.1
@@ -353,18 +355,65 @@
 
 3.1
 
-* 在Processing中，函数接收参数为弧度，使用角度思考，使用弧度写代码的方式为：`float angle = radians(60);rotate(angle)`.
+* 弧度 `radians=2*PI*(degrees/360)`
+* 在Processing中，函数接收参数为弧度，使用角度思考，使用弧度写代码的方式为：`float angle = radians(60); rotate(angle);`.
+
+3.2
+
+* 类似与线性运动公式，但比线性运动方程更简单，因为角度是标量，旋转运动公式
+  $$
+  \begin{align}
+  &angle=angle+angular\:\:velocity\\
+  &angular\:\:velocity=angular\:\:velocity+angle\:\:acceleration
+  \end{align}
+  $$
+
+* 一个示例：
+
+  ```java
+  translate(width/2,height/2);	//平移世界坐标系
+  rotate(angle);	//旋转世界坐标系
+  line(-50,0,50,0);
+  ellipse(50,0,8,8);
+  ellipse(-50,0,8,8);
+  ```
+
+* 从示例代码发现一个带有轨迹的例子：NOC_3_02_forces_angular_mot_trails，其中实现轨迹的方式为（截取与`draw()`）：
+
+  ```java
+  //backgound(255);	//不清空背景
+  
+  rectMode(CORNER);		//CORNER模式绘制矩形
+  noStroke();		//不勾勒边框
+  fill(255,5);	//fill(gray,alpha)，第二个参数越大，轨迹越短
+  rect(0,0,width,height);		//重绘整个视窗
+  ```
+
+  *注*：这里有必要了解一下矩形的绘制，`rect`第三和第四个参数是矩形的宽和高，第一和第二个参数是一个点的坐标，当`rectMode(CORNER)`时（默认模式），这个点是矩形的左上角顶点，当`rectMode(CENTER)`时，这个点是矩形的中点。
+
+3.3
+
+* 三角函数公式（sin,cos,tan）
+
+3.4
+
+* 如果物体不是圆形，当它跟随鼠标时，其实有两个意思：前端转向鼠标并朝着鼠标方向位移。
+
+* $tangent(angle)=\frac{velocity_y}{velocity_x}$，通常velocity已知，旋转角度angle未知，要求angle，需要借助`rangent`的反函数（逆函数）`arctangent`，在Processing中为`atan(value)`。
+
+* 上式的问题在于$atan(-4/3)=atan(4/-3)=-0.9272952$；为了区分方向，要是用`atan2(y, x)`。
+
+  ```java
+  float angle = atan2(velocity.y,velocity.x);
+  ```
+
+  或者更简单的
+
+  ```java
+  float angle = velocity.heading();	//内部调用了atan2()
+  ```
+
+3.5
+
 * 
-
-
-
-
-
-
-
-
-
-
-
-
 
