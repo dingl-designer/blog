@@ -246,8 +246,8 @@
 
   ```java
   void applyForce(PVector force){
-  	//force.div(mass); 错误写法
-  	PVector f = PVector.div(force, mass);		//正确写法；也可先复制力向量（force.get()），使用复制的值参加计算
+  	//force.div(mass); 		//错误写法
+  	PVector f = PVector.div(force, mass);		//正确写法；也可先复制向量（force.get()），使用复制的值参加计算
   	acceleration.add(f);
   }
   ```
@@ -413,7 +413,88 @@
   float angle = velocity.heading();	//内部调用了atan2()
   ```
 
+* 在示例NOC_3_03_pointing_velocity_trail中，运动的为了自然过渡的，即创建指向鼠标的加速度并逐渐改变当前物体的运动速度，而不是重置速度瞬间转向鼠标；转向时保持正面朝向当前速度的前方，而不是瞬间指向鼠标。那么，如果瞬间指向鼠标会怎样？如同漂移？
+
+  ```
+  float theta = velocity.heading2D();
+  ```
+
+  改为：
+
+  ```java
+  PVector mouse = new PVector(mouseX, mouseY);
+  PVector dir = PVector.sub(mouse, location);
+  float theta = dir.heading2D();
+  ```
+
+  上面的代码说明，在主函数，`mouseX, mouseY`亦可直接获取。
+
+* 另外一个问题，当Mover变为矩形之后，每次渲染会和圆形物体有所不同。
+
+  圆形物体只要给定圆心和半径，就可以画唯一的圆：
+
+  ```java
+  ellipse(location.x,location.y,mass*16,mass*16);
+  ```
+
+  矩形有方向属性，所以要先平移和旋转画板之后再画，其中平移也是必须的，因为旋转是以当前原点为参考点。
+
+  ```java
+  rectMode(CENTER);
+  translate(location.x, location.y);
+  rotate(theta);
+  rect(0, 0, 30, 10);
+  ```
+
 3.5
 
-* 
+* 极坐标系（角度和半径）和直角坐标系：Processing只能处理直角坐标系，所以极坐标系数据可以转到极坐标系。
+
+  ```java
+  float r = 75;
+  float theta = PI / 4;
+  //Converting from polar (r,theta) to Cartesian (x,y)
+  float x = r * cos(theta);
+  float y = r * sin(theta);
+  ```
+
+3.6
+
+* `sine,cosine`函数可以模拟震荡。
+
+  ```java
+  float amplitude = 100;		//振幅
+  float x = amplitude * sin(angle);	//位移
+  angle += aVelocity;		//更新弧度值
+  ```
+
+3.7
+
+* 震荡曲线由震荡幅度和周期决定。在现实世界，周期常与时间相关联，但是在Processing中，周期只能和帧数（渲染一次为一帧）相关联。$ 周期时间 = 周期帧数 \times 每帧时长$，人为规定其中想要的两个值，就可以得到第三个值。
+* 示例代码NOC_3_07_oscillating_objects中将物体的震荡从$x$轴方向震荡扩展到了在$x,y$轴同时震荡，震荡看起来无规律，是因为$x,y$轴两个方向的震荡周期不一致造成的。
+* 同样是在上面的示例中，所有物体做的是匀速震荡（Oscillation with Angular Velocity），其中匀速指的控制位移的自变量`angle`是匀速变化，不是指物体的位移是匀速变化。
+
+3.8
+
+* 一系列的物体上下震荡，可以用来模拟波浪或者动物的身体。
+* NOC_3_09_wave_a(bc)三个示例的`angleVel`不同，这导致相邻物体间的错位不一致。但是为什么运动周期会一致呢？这里见代码，每次渲染的时候第一个物体的位移由`startAngle`决定，这个值与`angleVel`无关，且在三份代码中相同。
+
+* NOC_3_08_static_wave_lines画了一条静态波浪线，使用了`beginShape()\endShape()`以及`vertex(x,y)`即将一系列的顶点（vertex）相连接。你是不是也设想过每个$x$值画一个像素（使用`point`）不也能得到一条线吗？想象一下图形学中把线段转成像素有多么麻烦，你应该就不会这么想了。
+* Exc_3_11_AdditiveWave显示的是多个波形的叠加，是整个宽度区间内的震荡的叠加，见代码`yvalues[i] += cos(x)*amplitude[j];`和`yvalues[i] += sin(x)*amplitude[j];`
+* 另一个问题，为什么波形看起来都是从右向左传播呢，如何让波形从左向右传播？这其实是由自变量（`angle`）的变化规律决定的。我们总是设定随着$x$的增加，`angle`是递增的，另一方面，随着时间的增加，`angle`也是递增的。这就导致随着时间的推移，左侧图形总是跟随右侧图形，或者说，右侧图形是左侧图形的未来的样子。所以，只要把两个递增的其中一个（而不是两个）改为递减就可以改变波的传播方向。
+
+3.9
+
+* 钟摆问题：钟摆由三部分构成，原点（origin）、摆臂（arm）、和钟摆（bob）。钟摆（bob）受到两个作用力，摆臂的牵引力和重力。两个力的合力沿着切线方向指向下方，大小为`G * sin(angle)`，`angle`为摆臂与垂直线夹角。
+* 上一步求得了作用力，根据牛顿第二定律，`A=F/M`，得出沿着切线方向的加速度。？是否混淆了线性加速度和旋转加速度？
+
+
+
+
+
+
+
+
+
+
 
