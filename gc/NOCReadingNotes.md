@@ -550,7 +550,7 @@
 
 * 上面的例子中，加速度一致是一个模仿重力的常量，如果像前几章那样，也给粒子添加函数`applyForce(PVector f)`供外部调用，就得到了一个可以施加外力的粒子系统。
 
-* 实例代码`NOC_4_08_ParticleSystemSmoke`模拟了随风飘动的烟雾。另外还使用到了图片渲染（用图片更容易模拟模糊的边界和渐变）：
+* 实例代码`NOC_4_08_ParticleSystemSmoke`模拟了随风飘动的烟雾。另外还使用到了图片渲染（用图片更容易模拟模糊的边界）：
 
   ```
   PImage img = loadImage("texture.png");	//加载图片
@@ -560,21 +560,75 @@
   image(img,loc.x,loc.y);
   ```
 
-  其中`loadImage(filename, extension)`默认从当前路径的`data`文件目录下搜索图片，也可以使用从根目录开始的绝对路径或网络资源。并且最好在`setup()`中进行预加载。
+  1 其中`loadImage(filename, extension)`默认从当前路径的`data`文件目录下搜索图片，也可以使用从根目录开始的绝对路径或网络资源。并且最好在`setup()`中进行预加载。
+  
+  2 如果想看清每个粒子的边界，粒子的`render()`函数中使用圆代替图片渲染。
+  
+  3 烟雾粒子的初始化速度是由高斯分布生成的，0.4节我们介绍了高斯分布（截取自粒子的构造函数）：
+  
+  ```java
+  float vx = (float) generator.nextGaussian()*0.3;
+  float vy = (float) generator.nextGaussian()*0.3 - 1.0;
+  ```
+  
+  粒子的平均速度是`(0,-1)`；`generator.nextGaussian()`生成数值范围关于零对称，但是没有严格边界。我们只能说，68%的数值分布在`(-1,1)`...
 
 4.12
 
+* 在系统中添加一个排斥物（Repeller），原理和Attractor类似。示例代码见`NOC_4_07_ParticleSystemForcesRepeller`
+
+4.13
+
+* 粒子的图形纹理和粒子初始速度的高斯分布使烟雾看起来更真实。其实在4.11节学习示例代码的时候不自觉地完成自学了，这里不再重复。另外作者建议图片使用`PNG`格式，因为Processing可以处理它的透明通道（alpha channel）。
+* 相加混合（additive blending）。在图形学中通过透明技术实现物体色彩的叠加叫做混合。通过在`draw()`函数的开始处调用`blendMode(mode)`进行设置。其中`mode`可取值`NORMAL`（默认）、`CENTER`等，还有一种`ADD`模式，这种模式会产生辉光效应（space-age glow effect），因为叠加的层越多就会变得越亮。
+
+* 为了实现相加混合，需要使用P2D或P3D渲染引擎。
+
+  ```java
+  void setup(){
+    size(640,360,P2D);
+  }
+  ```
+
+  这里我翻看了一下[size函数的API](https://processing.org/reference/size_.html)，在3.0的Processing中，建议`size()`函数放到`settings()`里。
+
+  ```java
+  void settings(){
+    size(640,360,P2D);
+  }
+  ```
+
+  另外`settings`和`setup`的区别：
+
+  ```html
+  The settings() method runs before the sketch has been set up, so other Processing functions cannot be used at that point. For instance, do not use loadImage() inside settings(). The settings() method runs "passively" to set a few variables, compared to the setup() command that call commands in the Processing API.
+  ```
+
+  
+
+#### 5 物理函数库
+
+5.0
+
+* 本书的哲学：已经有很多开源的物理引擎（open-source physics engine），为什么还要学习前四章？为了你好。
+
+5.1
+
+* Box2D用于开发了《蜡笔物理学》和《愤怒的小鸟》。
+* Box2D是一个纯物理引擎，不涉及计算机图形，只是接收物理参数，返回更多的值。
+* 我们为什么需要它？有了它，我们既可以使用Processing处理爆炸场景，又有时间陪伴家人和朋友。--Erin Catto（Creator of Box2D）花了多年心血。
+
+5.2
+
+* 在Processing中使用：[Box2D](http://box2d.org/)是用`c++`写的，Processing是基于`Java`的，所以可以直接用[JBox2D](http://www.jbox2d.org/)（Box2D的Java端口），为了方便，JBox2D与Processing之间还有一个附加层PBox2D，可减少调用时的代码冗余。
+
+* 另外一个值得一看的Processing Box2D封装库： [Fisica](http://www.ricardmarxer.com/fisica/) by Ricard Marxer。
+
+5.3
+
+* 因为Box2D不懂像素，为了调用Box2D，`setup`阶段需要将像素物体转换成Box2D可识别物体，`draw`阶段需要将Box2D物体转换到像素的世界。
+* Box2D世界的基本元素：World、Body、Shape、Fixture、Joint、Vec2等。
 * 
-
-
-
-
-
-
-
-
-
-
 
 
 
