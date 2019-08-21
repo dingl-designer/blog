@@ -627,7 +627,7 @@
 5.3
 
 * 因为Box2D不懂像素，为了调用Box2D，`setup`阶段需要将像素物体转换成Box2D可识别物体，`draw`阶段需要将Box2D物体转换到像素的世界。
-* Box2D世界的基本元素：World、Body、Shape、Fixture、Joint、Vec2等，后面将会详述这些元素的使用。
+* Box2D世界的基本组件：World、Body、Shape、Fixture、Joint、Vec2等，后面将会详述这些元素的使用。
 * PVector和Vec2语法的比较。
 
 
@@ -650,14 +650,64 @@
 
   2 我的工程中有很多粒子飞来飞去，他们有时相吸有时互斥，有时与弹簧连接，这时toxiclibs是最好选择。toxiclibs使用更简单，适合处理粒子连接系统，并且由于使用韦尔莱积分（Verlet integration）算法，它的性能也很好。
 
-* [toxiclibs官网](http://toxiclibs.org/)。toxiclibs有八个模块且各自独立，我们本章只用到了“verletphysics”和“toxiclibscore”。
+* 补充：[依赖库的手动导入方式](https://github.com/processing/processing/wiki/How-to-Install-a-Contributed-Library)，以toxiclibs为例：从[toxiclibs官网](http://toxiclibs.org/)下载toxiclibs的最新版zip包（`toxiclibs-complete-0200.zip`）待用。然后打开Processing，点击偏好设置（preference）菜单，弹出框的最上方有一个速写本（sketchbook）位置，Mac版默认为`~/Documents/Processing`，Windows下默认为`Documents/Processing`，这个文件夹下有一个`libraries`文件夹，如果没有就新建一下，将下载的zip包拷贝到`libraries`文件夹下并解压。文件目录`/Documents/Processing/libraries/toxiclibs-complete-0200/toxiclibscore`。重启Processing。手动导入完成。
+
+* 导入成功验证：打开示例代码`NOC_5_10_SimpleSpring`，点击运行，如果提示找不到`GravityBehavior2D`类，将`2D`后缀删除，执行成功。
+
+* toxiclibs的基本组件：VerletPhysics、VerletParticle、VerletSpring。toxiclibs的向量：Vec2D和Vec3D。
+
+* toxiclibs物理世界的初始化和调用：
+
+  ```java
+  VerletPhysics2D physics;
+   
+  void setup() {
+  Creating a toxiclibs Verlet physics world
+    physics=new VerletPhysics2D();
+    //hard boundaries past which objects cannot travel
+  	physics.setWorldBounds(new Rect(0,0,width,height));
+    //add gravity to the physics world
+  	physics.addBehavior(new GravityBehavior(new Vec2D(0,0.5)));
+  }
+  
+  void draw() {
+    physics.update();
+  }
+  ```
+
+5.16
+
+* toxiclibs的粒子通过继承来创建，使用`physics.addParticle(particle);`添加到VerletPhysics2D：
+
+  ```java
+  class Particle extends VerletParticle2D {
+    Particle(Vec2D loc) {
+  		//Calling super() so that the object is initialized properly
+      super(loc);
+    }
+   
+  	//We want this to be just like a VerletParticle, only with a display() method.
+    void display() {
+      fill(175);
+      stroke(0);
+  		//We’ve inherited x and y from VerletParticle!
+      ellipse(x,y,16,16);
+    }
+  }
+  ```
+
+* toxiclibs的弹簧类VerletSpring、VerletConstrainedSpring、VerletMinDistanceSpring，需要两个粒子进行初始化。
+
+  ```java
+  float len = 80;		//The rest length of the spring.
+  float strength = 0.01;	//How strong is the spring?
+  VerletSpring2D spring=new VerletSpring2D(particle1,particle2,len,strength);
+  physics.addSpring(spring);
+  ```
+
+5.17
+
 * 
-
-
-
-
-
-
 
 
 
