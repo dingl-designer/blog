@@ -627,10 +627,31 @@
 5.3
 
 * 因为Box2D不懂像素，为了调用Box2D，`setup`阶段需要将像素物体转换成Box2D可识别物体，`draw`阶段需要将Box2D物体转换到像素的世界。
-* Box2D世界的基本元素：World、Body、Shape、Fixture、Joint、Vec2等。
+* Box2D世界的基本元素：World、Body、Shape、Fixture、Joint、Vec2等，后面将会详述这些元素的使用。
+* PVector和Vec2语法的比较。
+
+
+
+...
+
+
+
+5.14
+
+* 微积分。
+
+5.15
+
+* 另外一个物理引擎：`toxiclibs`。toxiclibs是专门为Processing设计的，所以用起来不像Box2D那样麻烦。不需要下载一堆库文件，不需要转换坐标系，并且toxiclibs不限于二维世界。
+
+* `Box2D`和`toxiclibs`如何选择呢？
+
+  1 我的工程中有各种形状的物体碰撞、弹跳，那么我需要Box2D，toxiclibs不处理爆炸场景。
+
+  2 我的工程中有很多粒子飞来飞去，他们有时相吸有时互斥，有时与弹簧连接，这时toxiclibs是最好选择。toxiclibs使用更简单，适合处理粒子连接系统，并且由于使用韦尔莱积分（Verlet integration）算法，它的性能也很好。
+
+* [toxiclibs官网](http://toxiclibs.org/)。toxiclibs有八个模块且各自独立，我们本章只用到了“verletphysics”和“toxiclibscore”。
 * 
-
-
 
 
 
