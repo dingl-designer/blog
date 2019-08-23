@@ -162,14 +162,200 @@
 6.10
 
 * 复杂系统三原则：元素的有限感知；所有元素并行（同时）工作；作为整体的系统展现出新兴的现象。
+* 三个可选特征：非线性关系（混沌理论、蝴蝶效应）；竞争与合作，只在有生命的复杂系统里有；反馈（比如人类社会的供需关系、股市）。
+
+6.11
+
+* 组行为：分离。每个粒子和其他所有粒子比较，当距离小于指定距离时，累加反方向的期望速度（期望速度与距离成反比），并计算平均值。根据当前速度和总的期望速度，计算转向力。
+
+  ```java
+  void separate (ArrayList<Vehicle> vehicles) {
+  	//Note how the desired separation is based on the Vehicle’s size.
+      float desiredseparation = r*2;
+      PVector sum = new PVector();
+      int count = 0;
+      for (Vehicle other : vehicles) {
+        float d = PVector.dist(location, other.location);
+        if ((d > 0) && (d < desiredseparation)) {
+          PVector diff = PVector.sub(location, other.location);
+          diff.normalize();
+  		//What is the magnitude of the PVector pointing away from the other vehicle? The closer it is, the more we should flee. The farther, the less. So we divide by the distance to weight it appropriately.
+          diff.div(d);
+          sum.add(diff);
+          count++;
+        }
+      }
+      if (count > 0) {
+        sum.div(count);	//这个有必要吗，后面是normalize
+        sum.normalize();
+        sum.mult(maxspeed);
+        PVector steer = PVector.sub(sum, vel);
+        steer.limit(maxforce);
+        applyForce(steer);
+      }
+  }
+  ```
+
+6.12
+
+* 新建`void applyBehaviors()`来管理其他的行为：
+
+  ```java
+  void applyBehaviors(ArrayList<Vehicle> vehicles) {
+      PVector separate = separate(vehicles);
+      PVector seek = seek(new PVector(mouseX,mouseY));
+  	//We have to apply the force here since seek() and separate() no longer do so.
+      applyForce(separate);
+      applyForce(seek);
+  }
+  ```
+
+6.13
+
+* 集群（flocking）行为三原则：分离（separation、avoidance），避免与邻居碰撞的转向力；结盟（alignment、copy），保持和邻居的速度方向相同的转向力；内聚（cohesion、center），向着邻居中心的转向力。
+
+  ```java
+  void flock(ArrayList<Boid> boids) {
+  	//The three flocking rules
+      PVector sep = separate(boids);
+      PVector ali = align(boids);
+      PVector coh = cohesion(boids);
+  	//Arbitrary weights for these forces (Try different ones!)
+      sep.mult(1.5);
+      ali.mult(1.0);
+      coh.mult(1.0);
+  	//Applying all the forces
+      applyForce(sep);
+      applyForce(ali);
+      applyForce(coh);
+  }
+  ```
+
+* 分离转向力上一节已经实现了，下面是结盟转向力（只需要计算指定半径范围内的邻居速度）：
+
+  ```java
+  PVector align (ArrayList<Boid> boids) {
+  	//This is an arbitrary value and could vary from boid to boid.
+      float neighbordist = 50;
+      PVector sum = new PVector(0,0);
+      int count = 0;
+      for (Boid other : boids) {
+        float d = PVector.dist(location,other.location);
+        if ((d > 0) && (d < neighbordist)) {
+          sum.add(other.velocity);
+  		//For an average, we need to keep track of how many boids are within the distance.
+          count++;
+        }
+      }
+      if (count > 0) {
+        sum.div(count);	//同样，这个有必要吗，后面是normalize
+        sum.normalize();
+        sum.mult(maxspeed);
+        PVector steer = PVector.sub(sum,velocity);
+        steer.limit(maxforce);
+        return steer;
+      } else {
+        //If we don’t find any close boids, the steering force is zero.
+        return new PVector(0,0);
+      }
+  }
+  ```
+
+* 接下来是内聚。结盟计算的是邻居的平均速度，这里要计算的是邻居的平均位置：
+
+  ```java
+  PVector cohesion (ArrayList<Boid> boids) {
+      float neighbordist = 50;
+      PVector sum = new PVector(0,0);
+      int count = 0;
+      for (Boid other : boids) {
+        float d = PVector.dist(location,other.location);
+        if ((d > 0) && (d < neighbordist)) {
+  		//Adding up all the others’ locations
+          sum.add(other.location);
+          count++;
+        }
+      }
+      if (count > 0) {
+        sum.div(count);
+  	  //Here we make use of the seek() function we wrote in Example 6.8. The target we seek is the average location of our neighbors.
+        return seek(sum);
+      } else {
+        return new PVector(0,0);
+      }
+  }
+  ```
+
+6.14
+
+* 上面介绍的几圈算法复杂度为$N\times N$，当粒子较多时，效率极低。
+
+* 为了改善这种情况，Reynolds在2000年的一篇论文《[Interaction with Groups of Autonomous Characters](http://www.red3d.com/cwr/papers/2000/pip.pdf)》中详细介绍了“bin-lattice spatial subdivision”。利用该算法，假设将空间分为`10*10=100`个网格，2000个粒子的计算复杂度将从`4000000`降为`40000`。
+
+* 为了实现这个算法，需要增加一个二维数组`ArrayList<Boid>[][]`，每个元素是一个列表，记录当前网格内的所有粒子。
+
+  ```java
+  int column = int(boid.x) / resolution;
+  int row    = int(boid.y) /resolution;
+  grid[column][row].add(boid);
+  ```
+
+  当获取粒子的邻居时，只检查粒子所在网格的其他粒子即可。（事实上，当粒子在网格边缘时，还要检查邻居网格里的粒子）。
+
+6.15
+
+* 适当的场合，可以使用`magSq()`代替`mag()`以提高效率：
+
+  ```java
+  if (v.mag() > 10) {		//slow
+    // Do Something!
+  }
+  if (v.magSq() > 100) {		//fast
+    // Do Something!
+  }
+  ```
+
+* 计算耗时的函数包括`Square root, Sine, Cosine, Tangent`，要尽量避免这些函数出现在大量的循环中。一个可以考虑的方案是建立速查表。
+
+  ```java
+  float sinvalues[] = new float[360];
+  float cosvalues[] = new float[360];
+  for (int i = 0; i < 360; i++) {
+    sinvalues[i] = sin(radians(i));
+    cosvalues[i] = cos(radians(i));
+  }
+  ```
+
+  当我需要计算`sin(PI)`时，
+
+  ```java
+  int angle = int(degrees(PI));
+  float answer = sinvalues[angle];
+  ```
+
+* 为了使代码可读性强，示例代码的`draw()`函数以及调用的子函数中创建了超级多的`PVector`。这也会严重的影响效率。应该避免如此。
+
+  ```java
+  void draw() {		//slow
+    for (Vehicle v : vehicles) {
+     PVector mouse = new PVector(mouseX,mouseY);
+     v.seek(mouse);
+    }
+  }
+  
+  PVector mouse = new PVector();		//fast
+  void draw() {
+    mouse.x = mouseX;
+    mouse.y = mouseY;
+    for (Vehicle v : vehicles) {
+     v.seek(mouse);
+    }
+  }
+  ```
 
 
 
-
-
-
-
-
+#### 7 元胞自动机
 
 
 
