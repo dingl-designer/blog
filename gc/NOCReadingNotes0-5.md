@@ -620,15 +620,102 @@
 
 5.2
 
-* 在Processing中使用：[Box2D](http://box2d.org/)是用`c++`写的，Processing是基于`Java`的，所以可以直接用[JBox2D](http://www.jbox2d.org/)（Box2D的Java端口），为了方便，JBox2D与Processing之间还有一个附加层PBox2D，可减少调用时的代码冗余。
+* 在Processing中使用：[Box2D](http://box2d.org/)是用`c++`写的，Processing是基于`Java`的，所以可以直接用[JBox2D](http://www.jbox2d.org/)（Box2D的Java端口），为了方便，JBox2D与Processing之间还有一个附加层`PBox2D`（已经改名叫`Box2DProcessing`），可减少调用时的代码冗余。
 
-* 另外一个值得一看的Processing Box2D封装库： [Fisica](http://www.ricardmarxer.com/fisica/) by Ricard Marxer。
+* [Daniel Shiffman封装的Box2DProcessing](https://github.com/shiffman/Box2D-for-Processing)，可以选择自动或手动安装。
+
+* 自动安装：打开Processing，点击速写本（Sketch）>引入库文件（Import Library）>添加库文件（Add library），在弹出框的Libraries页签搜索并点击`Box2D for Processing  Author Daniel Shiffman`，点击下方的`Install`。重启Processing。
+
+* 手动安装：通过上面的链接打开Box2DProcessing的git项目，在dist目录下找到`box2d_processing.zip`。下载并解压到速写本目录即可。（参考5.15节手动安装Toxiclibs）
+
+* 导入验证。打开示例代码`NOC_5_2_Boxes`，点击运行提示找不到`PBox2D`。做如下改动：
+
+  ```java
+  import pbox2d.*;	//row 8
+  PBox2D box2d;		//row 14
+  box2d = new PBox2D(this);	//row 26
+  ```
+
+  改为：
+
+  ```java
+  import shiffman.box2d.*;
+  Box2DProcessing box2d;
+  box2d = new Box2DProcessing(this);
+  ```
+
+  点击运行。
 
 5.3
 
-* 因为Box2D不懂像素，为了调用Box2D，`setup`阶段需要将像素物体转换成Box2D可识别物体，`draw`阶段需要将Box2D物体转换到像素的世界。
+* 使用Box2D，在SETUP和DRAW阶段代码逻辑与之前有所不同。
+
+  * SETUP：1 在我们的像素世界建立所有对象；2 将所有对象从像素世界转换到Box2D世界。
+  * DRAW：1 询问Box2D所有对象的位置；2 将Box2D给出的答案转换到像素的世界； 3渲染所有对象。
+
+  其中SETUP的步骤2和DRAW的步骤1、2是使用Box2D时新增的。
+
 * Box2D世界的基本组件：World、Body、Shape、Fixture、Joint、Vec2等，后面将会详述这些元素的使用。
+
 * PVector和Vec2语法的比较。
+
+  ```java
+  Vec2 a = new Vec2(1,-1);
+  Vec2 b = new Vec2(3,4);
+  a.addLocal(b);	//相当于PVector的非静态add
+  Vec2 c = a.add(b);	//无变化
+  float m = a.length();	//相当于PVector的mag
+  a.normalize();		//无变化
+  ```
+
+5.4
+
+* Box2D的World类，掌控一切。初始化如下：
+
+  ```java
+  Box2DProcessing box2d;
+  void setup() {
+    box2d = new Box2DProcessing(this);
+    //Initializes a Box2D world with default settings
+    box2d.createWorld();
+  }
+  ```
+
+  对象创建之后会默认设置向下的重力加速度，也可以自己设定：
+
+  ```java
+  box2d.setGravity(0, -10);
+  ```
+
+  `-10`？没错，Box2D的坐标系和Processing不同，在Box2D中，屏幕中心为坐标原点，`y`轴指向上方，`x`轴向右。此外，两个坐标系的单位长度也不相等。
+
+* 使用Box2DProcessing提供的函数可以进行Processing（pixels）坐标系和Box2D（world）坐标系的转换：
+
+  ```java
+  Vec2 mouseWorld = box2d.coordPixelsToWorld(mouseX,mouseY);
+  ```
+
+  ```java
+  Vec2 worldPos = new Vec2(-10,25); 
+  Vec2 pixelPos = box2d.coordWorldToPixels(worldPos);
+  ellipse(pixelPos.x, pixelPos.y,16,16);
+  ```
+
+  其他方法：`coordWorldToPixelsPVector`返回PVector对象，`scalarWorldToPixels`可转换标量。
+
+5.5
+
+* 
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -642,7 +729,7 @@
 
 5.15
 
-* 另外一个物理引擎：`toxiclibs`。toxiclibs是专门为Processing设计的，所以用起来不像Box2D那样麻烦。不需要下载一堆库文件，不需要转换坐标系，并且toxiclibs不限于二维世界。
+* 另外一个物理引擎：`toxiclibs`。toxiclibs是专门为Processing设计的，所以用起来不像Box2D那样麻烦。不需要转换坐标系，并且toxiclibs不限于二维世界。
 
 * `Box2D`和`toxiclibs`如何选择呢？
 
