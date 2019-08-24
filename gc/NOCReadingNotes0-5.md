@@ -2,6 +2,8 @@
 
 [The Nature of Code示例代码](https://github.com/nature-of-code/noc-examples-processing)
 
+*注*：通过[本书主页]([https://natureofcode.com](https://natureofcode.com/))的下载按钮获取的示例代码包含过时的内容（比如第五章关于Box2DProcessing，旧版本名字为PBox2D），如果你已经从这里下载了，强烈建议通过上面的链接重新获取最新版本。
+
 
 
 #### 0 Introduction
@@ -628,23 +630,24 @@
 
 * 手动安装：通过上面的链接打开Box2DProcessing的git项目，在dist目录下找到`box2d_processing.zip`。下载并解压到速写本目录即可。（参考5.15节手动安装Toxiclibs）
 
-* 导入验证。打开示例代码`NOC_5_2_Boxes`，点击运行提示找不到`PBox2D`。做如下改动：
+* 导入验证。打开示例代码`NOC_5_2_Boxes`，点击运行。
 
+  如果提示找不到`PBox2D`。通过页面开始处的链接获取最新代码，或者手动改动如下：
+  
   ```java
   import pbox2d.*;	//row 8
   PBox2D box2d;		//row 14
-  box2d = new PBox2D(this);	//row 26
+box2d = new PBox2D(this);	//row 26
   ```
 
   改为：
-
+  
   ```java
   import shiffman.box2d.*;
   Box2DProcessing box2d;
-  box2d = new Box2DProcessing(this);
+box2d = new Box2DProcessing(this);
   ```
-
-  点击运行。
+  
 
 5.3
 
@@ -705,7 +708,340 @@
 
 5.5
 
+* Box2D的Body类相当于我们之前定义的Mover类，Body可以是运动的也可以是固定的，Body没有几何属性，但是可以绑定Shape属性。
+
+* 定义Body之前要先声明定义（definition）类。
+
+  ```java
+  BodyDef bd = new BodyDef();
+  ```
+
+  配置Body的属性，比如位置：
+
+  ```java
+  Vec2 center = new Vec2(width/2,height/2);
+  Vec2 center = box2d.coordPixelsToWorld(width/2,height/2));	//转换坐标系
+  bd.position.set(center);
+  ```
+
+  Body的类型有：动态的（Dynamic）、静态的（Static）和运动的（Kinematic）。
+
+  ```java
+  bd.type = BodyType.DYNAMIC;
+  ```
+
+  其他一些属性：
+
+  ```java
+  bd.fixedRotation = true;		//国定角度
+  bd.linearDamping = 0.8;			//设置线性阻力
+  bd.angularDamping = 0.9;		//旋转阻力
+  bd.bullet = true;						//如果物体将快速移动，将其设置为bullet
+  ```
+
+* 配置完定义，就可以创建Body了。
+
+  ```java
+  Body body = box2d.createBody(bd);		//bd可用于创建多个Body
+  ```
+
+  可以配置初始速度：
+
+  ```java
+  body.setLinearVelocity(new Vec2(0,3));	//线性速度
+  body.setAngularVelocity(1.2);		//角速度
+  ```
+
+5.6
+
+* Body、Shape和Feature三位一体。如果Body对象时灵魂，Shape对象就是灵魂居住的躯壳。Shape也会影响Body的运动，因为Shape有密度（质量）、摩擦力和通过fixture定义的反弹力。
+
+* 定义Shape前要先确定要定义的类型。比如使用PolygonShape创建矩形。
+
+  ```java
+  PolygonShape ps = new PolygonShape();
+  float box2Dw = box2d.scalarPixelsToWorld(150);	//标量转换
+  float box2Dh = box2d.scalarPixelsToWorld(100);
+  ps.setAsBox(box2Dw, box2Dh);	//Use setAsBox() function to define shape as a rectangle.
+  ```
+
+* 创建fixture，分配Shape：
+
+  ```java
+  FixtureDef fd = new FixtureDef();
+  fd.shape = ps;	//The fixture is assigned the PolygonShape we just made.
+  fd.friction = 0.3;
+  fd.restitution = 0.5;
+  fd.density = 1.0;
+  ```
+
+* 使用fixture将Shape绑定到Body：
+
+  ```java
+  body.createFixture(fd);
+  ```
+
+5.7
+
+* 一旦Body被创建（），Box2D总是知道它在哪，检查他的碰撞，根据受力移动它，Box2D会自主进行这些计算而不需要你动一根手指。
+
+* Box2D会维护一个列表，用来保存所有的Body对象可以通过`getBodyList()`获取。但是我们最好维护自己的列表，这可能会牺牲效率，但能让我们有更多的主动性。
+
+* 示例代码`NOC_5_1_box2d_excercise`是不使用Box2D的进行的编程；`NOC_5_1_box2d_excercise_solved`是使用Box2D的效果，由于默认的重力作用，后者生成的矩形会自由落体。现在梳理一下Box2D的使用流程。
+
+  * 第一步，在主函数中添加Box2D：
+
+    ```java
+    PBox2D box2d;
+    
+    void setup() {
+      box2d = new PBox2D(this);		//Initialize and create the Box2D world.
+      box2d.createWorld();
+    }
+    void draw() {
+      box2d.step();		//We must always step through time!
+    }
+    ```
+
+  * 第二步，将Processing对象和Box2D对象建立关系，我们之前维护的对象属性，现在依旧不应舍弃，这是为了方便渲染：
+
+    ```java
+    class Box  {
+    	//Instead of any of the usual variables, we will store a reference to a Box2D body.
+      Body body;	
+      float w;
+      float h;
+      
+      Box() {
+        w = 16;
+        h = 16;
+    		//Build body.
+        BodyDef bd = new BodyDef();
+        bd.type = BodyType.DYNAMIC;
+        bd.position.set(box2d.coordPixelsToWorld(mouseX,mouseY));
+        body = box2d.createBody(bd);
+    		//Build shape.
+        PolygonShape ps = new PolygonShape();
+        float box2dW = box2d.scalarPixelsToWorld(w/2);
+        float box2dH = box2d.scalarPixelsToWorld(h/2);
+        ps.setAsBox(box2dW, box2dH);
+    		//create a fixture
+        FixtureDef fd = new FixtureDef();
+        fd.shape = ps;
+        fd.density = 1;
+        fd.friction = 0.3;
+        fd.restitution = 0.5;
+    		//Attach the Shape to the Body with the Fixture.
+        body.createFixture(fd);
+      }
+      
+      void display() {
+    		//We need the Body’s location and angle.
+        Vec2 pos = box2d.getBodyPixelCoord(body);
+        float a = body.getAngle();
+     
+        pushMatrix();
+    		//Using the Vec2 position and float angle to translate and rotate the rectangle
+        translate(pos.x,pos.y);
+        rotate(-a);		//这里是-a
+        fill(175);
+        stroke(0);
+        rectMode(CENTER);
+        rect(0,0,w,h);
+        popMatrix();
+      }
+      
+      void killBody() {
+        box2d.destroyBody(body);		//从Box2D的世界删除该Body
+      }
+    }
+    ```
+
+    其中需要注意的是，由于Processing和Box2D坐标系的`y`轴方向相反，导致`body.getAngle()`获取的角度乘以`-1`以后才能使用。
+
+5.8
+
+* 使用`BodyType.STATIC`添加固定边界，比如在上面的示例中添加两条固定边界：
+
+  ```java
+  class Boundary {
+  	//A boundary is a simple rectangle with x, y, width, and height.
+    float x,y;
+    float w,h;
+    Body b;
+   
+    Boundary(float x_,float y_, float w_, float h_) {
+      x = x_;
+      y = y_;
+      w = w_;
+      h = h_;
+   
+  		//Build the Box2D Body and Shape.
+      BodyDef bd = new BodyDef();
+      bd.position.set(box2d.coordPixelsToWorld(x,y));
+  		//Make it fixed by setting type to STATIC!
+      bd.type = BodyType.STATIC;
+      b = box2d.createBody(bd);
+   
+      float box2dW = box2d.scalarPixelsToWorld(w/2);
+      float box2dH = box2d.scalarPixelsToWorld(h/2);
+      PolygonShape ps = new PolygonShape();
+  		//The PolygonShape is just a box.
+      ps.setAsBox(box2dW, box2dH);
+  		//Using the createFixture() shortcut
+      b.createFixture(ps,1);		//将Shape绑定到Body的简易方式，1为密度（density）
+    }
+   
+  	//Since we know it can never move, we can just draw it the old-fashioned way, using our original variables. No need to query Box2D.
+    void display() {
+      fill(0);
+      stroke(0);
+      rectMode(CENTER);
+      rect(x,y,w,h);
+    }
+  }
+  ```
+
+5.9
+
+* 使用`ChainShape`画曲线边界：
+
+  ```java
+  class Surface {
+    ArrayList<Vec2> surface;
+    
+    Surface() {
+      surface = new ArrayList<Vec2>();
+  		//3 vertices in pixel coordinates
+      surface.add(new Vec2(0, height/2+50));
+      surface.add(new Vec2(width/2, height/2+50));
+      surface.add(new Vec2(width, height/2));
+   
+      ChainShape chain = new ChainShape();
+  		//Make an array of Vec2 for the ChainShape.
+      Vec2[] vertices = new Vec2[surface.size()];
+      for (int i = 0; i < vertices.length; i++) {
+  			//Convert each vertex to Box2D World coordinates.
+        vertices[i] = box2d.coordPixelsToWorld(surface.get(i));
+      }
+  		//Create the ChainShape with array of Vec2.
+      chain.createChain(vertices, vertices.length);
+  		//Attach the Shape to the Body.
+      BodyDef bd = new BodyDef();		//ChainShape将要绑定的Body不需要设置position和type属性，ChainShape会处理好这些（type默认为STATIC）。
+  		Body body = box2d.world.createBody(bd);
+      body.createFixture(chain, 1);
+    }
+    
+    void display() {
+      strokeWeight(1);
+      stroke(0);
+      noFill();
+  		//Draw the ChainShape as a series of vertices.
+      beginShape();
+      for (Vec2 v: surface) {
+        vertex(v.x,v.y);
+      }
+      endShape();
+    }
+  }
+  ```
+
+  另外我注意到`box2d.world.createBody(bd)`，这和`box2d.createBody(bd)`是一致的，因为在`Box2DProcessing`中：
+
+  ```java
+  public Body createBody(BodyDef bd) {
+  	return world.createBody(bd);
+  }
+  ```
+
+5.10
+
+* 使用Box2D画复杂形状有两种方案，一种是使用`PolygonShape`：
+
+  ```java
+  Vec2[] vertices = new Vec2[4];  // An array of 4 vectors
+  vertices[0] = box2d.vectorPixelsToWorld(new Vec2(-15, 25));
+  vertices[1] = box2d.vectorPixelsToWorld(new Vec2(15, 0));
+  vertices[2] = box2d.vectorPixelsToWorld(new Vec2(20, -15));
+  vertices[3] = box2d.vectorPixelsToWorld(new Vec2(-10, -10));
+  //Making a polygon from that array
+  PolygonShape ps = new PolygonShape();
+  ps.set(vertices, vertices.length);
+  ```
+
+  需要注意的，一个是顶点顺序（Processing和Box2D旋转方向相反）；另外一个，Box2D无法处理凹多边形碰撞，所以如果要画凹多边形，需要分解成多个图多边形（稍后会介绍）。
+
+* 当渲染图形的时候，就需要从Box2D中取回这些顶点：
+
+  ```java
+  void display() {
+      Vec2 pos = box2d.getBodyPixelCoord(body);
+      float a = body.getAngle();
+  		//First we get the Fixture attached to the body...
+      Fixture f = body.getFixtureList();
+      PolygonShape ps = (PolygonShape) f.getShape();
+   
+      rectMode(CENTER);
+      pushMatrix();
+      translate(pos.x,pos.y);
+      rotate(-a);
+      fill(175);
+      stroke(0);
+      beginShape();
+  		//We can loop through that array and convert each vertex from Box2D space to pixels.
+      for (int i = 0; i < ps.getVertexCount(); i++) {
+        Vec2 v = box2d.vectorWorldToPixels(ps.getVertex(i));
+        vertex(v.x,v.y);
+      }
+      endShape(CLOSE);
+      popMatrix();
+    }
+  ```
+
+* 那么凹多边形（或者多个图多边形组成的图形）要怎么画呢？回忆一下单个Shape的情况：
+
+  * Step 1: Define the body.
+  * Step 2: Create the body.
+  * **Step 3: Define the shape.**
+  * **Step 4: Attach the shape to the body.**
+  * Step 5: Finalize the body’s mass.
+
+  现在我们只需要重复第3和第4步就可以了。
+
+  ```java
+  BodyDef bd = new BodyDef();
+  bd.type = BodyType.DYNAMIC;
+  bd.position.set(box2d.coordPixelsToWorld(center));
+  body = box2d.createBody(bd);
+   
+  //Making shape 1 (the rectangle)
+  PolygonShape ps = new PolygonShape();
+  float box2dW = box2d.scalarPixelsToWorld(w/2);
+  float box2dH = box2d.scalarPixelsToWorld(h/2);
+  sd.setAsBox(box2dW, box2dH);
+  //Making shape 2 (the circle)
+  CircleShape cs = new CircleShape();
+  cs.m_radius = box2d.scalarPixelsToWorld(r);
+  //设置圆形的偏移
+  Vec2 offset = new Vec2(0,-h/2);
+  offset = box2d.vectorPixelsToWorld(offset);
+  cs.m_p.set(offset.x,offset.y);
+  //Attach both shapes with a fixture.
+  body.createFixture(ps,1.0);
+  body.createFixture(cs, 1.0);
+  ```
+
+  其中`cs.m_p.set(offset.x,offset.y);`设置了圆形的偏移，因为默认情况下，Shape在绑定到Body的时候，Body的位置作为Shape的中心位置。
+
+  见示例代码`NOC_5_5_MultiShapes`。
+
+5.11
+
 * 
+
+
+
+
 
 
 
