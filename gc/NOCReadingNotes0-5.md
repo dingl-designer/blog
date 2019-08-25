@@ -41,13 +41,13 @@
   float montecarlo() {
     //We do this “forever” until we find a qualifying random value.
     while (true) {
-  	//Pick a random value.
+  		//Pick a random value.
       float r1 = random(1);
-  	//Assign a probability.
+  		//Assign a probability.
       float probability = r1;
-  	//Pick a second random value.
+  		//Pick a second random value.
       float r2 = random(1);
-  	//Does it qualify? If so, we’re done!
+  		//Does it qualify? If so, we’re done!
       if (r2 < probability) {
         return r1;
       }
@@ -140,7 +140,7 @@
 
 * 加法之外还有其他函数：
 
-`sub,mult,div,mag(计算向量长度),setMag,normalize(单位向量),limit,heading,rotate,lerp,dist,angleBetween,dot,cross,random2D,random3D`
+  `sub,mult,div,mag(计算向量长度),setMag,normalize(单位向量),limit,heading,rotate,lerp,dist,angleBetween,dot,cross,random2D,random3D`
 
 1.5
 
@@ -637,7 +637,7 @@
   ```java
   import pbox2d.*;	//row 8
   PBox2D box2d;		//row 14
-box2d = new PBox2D(this);	//row 26
+	box2d = new PBox2D(this);	//row 26
   ```
 
   改为：
@@ -1037,7 +1037,83 @@ box2d = new Box2DProcessing(this);
 
 5.11
 
+* Box2D连接器（Joint）有很多种，本章介绍其中三种：distance joints, revolute joints, and “mouse” joints。
+
+* 距离连接器（distance joint）：使用固定（这里说是固定不太合适，后面说连接可以是弹性的）长度连接两个Body的中心位置。
+
+  ```java
+  //准备两个和Body关联的对象
+  Particle p1 = new Particle();
+  Particle p2 = new Particle();
+  //创建连接器
+  DistanceJointDef djd = new DistanceJointDef();
+  //关联连接器和Body
+  djd.bodyA = p1.body;
+  djd.bodyB = p2.body;
+  //定义连接器长度
+  djd.length = box2d.scalarPixelsToWorld(10);
+  //可以定义连接器的弹性（频率和阻力系数）
+  djd.frequencyHz  = ___;		//频率用Hz表示
+  djd.dampingRatio = ___;		//Dampens the spring; typically a number between 0 and 1.
+  //创建连接器
+  DistanceJoint dj = (DistanceJoint) box2d.world.createJoint(djd);
+  ```
+
+* 旋转连接器（revolute joint）的使用：
+
+  ```java
+  Box box1 = new Box();
+  Box box2 = new Box();
+  RevoluteJointDef rjd = new RevoluteJointDef();
+  //旋转连接器最重要的属性，除了两个连接的物体外，还要指定连接点，下面的代码使用第一个物体的中心作连接点
+  rjd.initialize(box1.body, box2.body, box1.body.getWorldCenter());
+  //可以选择是否开启发动机（motor），开启之后可以在发动机作用下自行旋转
+  rjd.enableMotor = true;		//开启发动机
+  rjd.motorSpeed = PI*2;		//How fast is the motor?
+  rjd.maxMotorTorque = 1000.0;		//How powerful is the motor?
+  //还可以设置旋转角度限制（我尝试了一下开启发动机后加上角度限制，嗯，发动机肯定很烫）
+  rjd.enableLimit = true;
+  rjd.lowerAngle = -PI/8;
+  rjd.upperAngle = PI/8;
+  //创建连接器
+  RevoluteJoint joint = (RevoluteJoint) box2d.world.createJoint(rjd);
+  ```
+
+* 最后是鼠标连接器（mouse joint），鼠标连接器其实是用来拖拽物体的。Box2D中不是可以直接设置物体的位移吗，为什么还需要连接器呢？像下面这样不是很方便吗？
+
+  ```java
+  Vec2 mouse = box2d.screenToWorld(x,y);
+  body.setTransform(mouse,0);
+  ```
+
+  这样做的问题就像是，你在系统里里面加了一个传送门，这是不符合牛顿定律的，可能会给Box2D造成混乱。我们来看一下正确的做法：
+
+  ```java
+  MouseJointDef md = new MouseJointDef();
+  md.bodyA = box2d.getGroundBody();		//Whoa, this is new!
+  md.bodyB = box.body;		//Attach the Box body.
+  //Set properties.
+  md.maxForce = 5000.0;
+  md.frequencyHz = 5.0;
+  md.dampingRatio = 0.9;
+  //Create the joint.
+  MouseJoint mouseJoint = (MouseJoint) box2d.world.createJoint(md);.
+  ```
+
+  其中`md.bodyA = box2d.getGroundBody();`是指连接器的一端连接到`ground`，可以理解成屏幕（screen）。连接器创建完成，我们想要在鼠标鼠标拖拽的时候更新目标位置
+
+  ```java
+  Vec2 mouseWorld = box2d.coordPixelsToWorld(mouseX,mouseY);
+  mouseJoint.setTarget(mouseWorld);
+  ```
+
+  另外一件要做的事，就是状态切换：当鼠标点击的时候，创建鼠标连接器，鼠标释放，销毁它。示例代码见`NOC_5_8_MouseJoint`。
+
+5.12
+
 * 
+
+
 
 
 
