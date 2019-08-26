@@ -4,5 +4,5 @@
 
 #### [工作场景](./ws-index.html)
 
-#### [Computer Graphics](./gc-index.html)
+#### [图形学](./gc/index.html)
 
