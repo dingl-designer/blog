@@ -754,7 +754,7 @@ box2d = new Box2DProcessing(this);
 
 5.6
 
-* Body、Shape和Feature三位一体。如果Body对象时灵魂，Shape对象就是灵魂居住的躯壳。Shape也会影响Body的运动，因为Shape有密度（质量）、摩擦力和通过fixture定义的反弹力。
+* 物体（Body）、形状（Shape）和固定装置（Fixture）三位一体。如果Body对象是灵魂，形状对象就是灵魂居住的躯壳。Shape也会影响Body的运动，因为Shape有密度（质量）、摩擦力和通过Fixture定义的反弹力。
 
 * 定义Shape前要先确定要定义的类型。比如使用PolygonShape创建矩形。
 
@@ -765,7 +765,7 @@ box2d = new Box2DProcessing(this);
   ps.setAsBox(box2Dw, box2Dh);	//Use setAsBox() function to define shape as a rectangle.
   ```
 
-* 创建fixture，分配Shape：
+* 创建Fixture，分配Shape：
 
   ```java
   FixtureDef fd = new FixtureDef();
@@ -775,7 +775,7 @@ box2d = new Box2DProcessing(this);
   fd.density = 1.0;
   ```
 
-* 使用fixture将Shape绑定到Body：
+* 使用Fixture将Shape绑定到Body：
 
   ```java
   body.createFixture(fd);
@@ -807,7 +807,7 @@ box2d = new Box2DProcessing(this);
 
     ```java
     class Box  {
-    	//Instead of any of the usual variables, we will store a reference to a Box2D body.
+      //Instead of any of the usual variables, we will store a reference to a Box2D body.
       Body body;	
       float w;
       float h;
@@ -815,33 +815,33 @@ box2d = new Box2DProcessing(this);
       Box() {
         w = 16;
         h = 16;
-    		//Build body.
+    	//Build body.
         BodyDef bd = new BodyDef();
         bd.type = BodyType.DYNAMIC;
         bd.position.set(box2d.coordPixelsToWorld(mouseX,mouseY));
         body = box2d.createBody(bd);
-    		//Build shape.
+    	//Build shape.
         PolygonShape ps = new PolygonShape();
         float box2dW = box2d.scalarPixelsToWorld(w/2);
         float box2dH = box2d.scalarPixelsToWorld(h/2);
         ps.setAsBox(box2dW, box2dH);
-    		//create a fixture
+    	//create a fixture
         FixtureDef fd = new FixtureDef();
         fd.shape = ps;
         fd.density = 1;
         fd.friction = 0.3;
         fd.restitution = 0.5;
-    		//Attach the Shape to the Body with the Fixture.
+    	//Attach the Shape to the Body with the Fixture.
         body.createFixture(fd);
       }
       
       void display() {
-    		//We need the Body’s location and angle.
+    	//We need the Body’s location and angle.
         Vec2 pos = box2d.getBodyPixelCoord(body);
         float a = body.getAngle();
      
         pushMatrix();
-    		//Using the Vec2 position and float angle to translate and rotate the rectangle
+    	//Using the Vec2 position and float angle to translate and rotate the rectangle
         translate(pos.x,pos.y);
         rotate(-a);		//这里是-a
         fill(175);
@@ -1111,37 +1111,158 @@ box2d = new Box2DProcessing(this);
 
 5.12
 
-* 
+* 在第二章中我们讨论了如何应用各种力，我们在Mover中添加了applyForce函数 ，在函数中使用力除以质量求出加速度。在Box2D的Body类中也有这样的函数，不需要我们自己计算。
 
+  ```java
+  class Box {
+    Body body;
+    void applyForce(Vec2 force) {
+      Vec2 pos = body.getWorldCenter();
+  	//Calling the Body's applyForce() function
+      body.applyForce(force, pos);
+    }
+  }
+  ```
 
+  重要的区别在于Box2D是一个更复杂的系统，在应用力的时候需要指定作用点，上面的力作用在了Body的中心点。下面是将第二章的万有引力应用到Box2D物体上的写法的。第二章代码：
 
+  ```java
+  PVector attract(Mover m) {
+    PVector force = PVector.sub(location,m.location);
+    float distance = force.mag();
+    distance = constrain(distance,5.0,25.0);
+    force.normalize();
+    float strength = (g * mass * m.mass) / (distance * distance);
+    force.mult(strength);
+    return force;
+  }
+  ```
 
+  使用Box2D的Vec2重写后：
 
+  ```java
+  Vec2 attract(Mover m) {
+    //We have to ask Box2D for the locations first!
+    Vec2 pos = body.getWorldCenter();
+    Vec2 moverPos = m.body.getWorldCenter();
+    Vec2 force = pos.sub(moverPos);
+    float distance = force.length();
+    distance = constrain(distance,1,5);
+    force.normalize();
+    float strength = (G * 1 * m.body.m_mass) / (distance * distance);
+    //Remember, it’s mulLocal() for Vec2.
+    force.mulLocal(strength);
+    return force;
+  }
+  ```
 
+5.13
 
+* 因为本书不是专门介绍Box2D的，所以我不能覆盖所有Box2D的知识点。不过在介绍完Body、Shape、Joint之后，我觉得还有一个值得讲一讲的东西：碰撞事件。
 
+* 事实上Box2D已经帮我们考虑了所有的碰撞情况，并且处理得很好，所以不要误解我，我并不是想把碰撞重新实现一遍，而是当碰撞发生的时候，我们还能做点什么，就比如你要卖掉一个叫做《愤怒的小鸟》的游戏，那么当一只脾气暴躁的鸽子碰撞纸板箱的时候，你最好还要做些其他的东西。Box2D使用接口（interface）来提醒你碰撞发生的时刻。
 
+* 检测碰撞事件会处理一个回调函数，用法和`mousePressed()`差不多，当碰撞发生的时候，会触发`beginContact()`。
 
+  ```java
+  void mousePressed() {
+    println("The mouse was pressed!");
+  }
+  //What our "beginContact" event looks like.
+  void beginContact(Contact cp) {
+    println("Something collided in the Box2D World!");
+  }
+  ```
 
+  为了使监听生效，我们需要告诉Box2D我们需要监听（当我们不需要监听的时候，Box2D就可以不监听从而减少开销）。
 
+  ```java
+  void setup() {
+    box2d = new PBox2D(this);
+    box2d.createWorld();
+    //Add this line if you want to listen for collisions.
+    box2d.listenForCollisions();
+  }
+  ```
 
+* 碰撞的监听事件有：
 
+  * beginContact()：两个物体第一次接触时触发；
+  * endContact()：物体持续接触过程中会一遍又一遍地触发；
+  * preSolve()：计算碰撞结果之前触发，在beginContact()之前，如有必要，可设置碰撞失效；
+  * postSolve()：计算完碰撞之后触发，使收集碰撞结果（冲力）信息成为可能。
 
+* `beginContact(Contact cp)`，利用事件参数`cp`可以获取所有的碰撞信息。比如有两个绑定到`Particle`的Box2D Body发生了碰撞：
 
+  ```java
+  //通过cp获取碰撞的两个固定装置
+  Fixture f1 = cp.getFixtureA();
+  Fixture f2 = cp.getFixtureB();
+  //通过固定装置获取碰撞的两个物体
+  Body b1 = f1.getBody();
+  Body b2 = f2.getBody();
+  ```
 
+  那么如何通过Body获取到绑定的Processing中的Particle对象呢？我们看一下Particle的构造函数：
 
+  ```java
+  class Particle {
+    Body body;
+   
+    Particle(float x, float y, float r) {
+      BodyDef bd = new BodyDef();
+      bd.position = box2d.coordPixelsToWorld(x, y);
+      bd.type = BodyType.DYNAMIC;
+      body = box2d.createBody(bd);
+      CircleShape cs = new CircleShape();
+      cs.m_radius = box2d.scalarPixelsToWorld(r);
+      body.createFixture(fd,1);
+   
+      body.setUserData(this);	//"this" refers to this Particle object. We are telling the Box2D Body to store a reference to this Particle that we can access later.
+    }
+  ...
+  ```
 
-...
+  有了上面的绑定过程`body.setUserData(this)`，我们就可以这样获取：
+
+  ```java
+  Particle p1 = (Particle) b1.getUserData();
+  Particle p2 = (Particle) b2.getUserData();
+  ```
+
+  但是...但是，在大部分情况下，我们并不知道碰撞的是不是两个Particle，所以在强制转换对象类型之前，要先做判断：
+
+  ```java
+  Object o1 = b1.getUserData();
+  if (o1.getClass() == Particle.class) {
+  	Particle p = (Particle) o1;
+  	p.change();
+  }
+  ```
+
+* 另外需要注意的是不能在上面这四个回调函数中销毁Box2D实体，在回调函数中确定需要删除，一种可行的方法是打标记（比如：`markForDeletion = true`），然后在draw() 函数中检查并删除。
 
 
 
 5.14
 
-* 微积分。
+* 积分（Integration ）算法是微积分（calculus）领域两个重要算法之一，另外一个是微分（differentiation）。在我们的程序中一直在使用积分，比如：
+
+  ```java
+  velocity.add(acceleration);
+  location.add(velocity);
+  ```
+
+  这种方法被称为欧拉（Euler）积分法，这种积分法最简单，也最容易通过代码实现，但这种算法并不是最高效、也不是最准确的方法。欧拉方法通过分段计算来模拟连续的现实世界，这就产生了不准确的数据。提高欧拉算法准确性的方案是使用更小的时间间隔，但这会是我们的程序运行地非常慢。
+
+  尽管如此，欧拉算法依旧是最基础和最易实现的方法，大部分情况下是适用的。
+
+* 还有一种积分法叫做Runge-Kutta，在一些物理引擎中被使用。
+* 一种非常流行的积分法，即下一个物理引擎（toxiclibs）使用的算法，叫做Verlet integration。这种算法在考虑运动问题时不存储速度变量，而是在程序运行过程中计算速度。该方法尤其适用于粒子系统，特别是弹簧连接的粒子系统。如果想了解更多，见[维基](https://en.wikipedia.org/wiki/Verlet_integration)。
 
 5.15
 
-* 另外一个物理引擎：`toxiclibs`。toxiclibs是专门为Processing设计的，所以用起来不像Box2D那样麻烦。不需要转换坐标系，并且toxiclibs不限于二维世界。
+* 正式介绍另一个物理引擎：`toxiclibs`。toxiclibs是专门为Processing设计的，所以用起来不像Box2D那样麻烦。不需要转换坐标系，并且toxiclibs不限于二维世界。
 
 * `Box2D`和`toxiclibs`如何选择呢？
 
@@ -1181,20 +1302,19 @@ box2d = new Box2DProcessing(this);
   ```java
   class Particle extends VerletParticle2D {
     Particle(Vec2D loc) {
-  		//Calling super() so that the object is initialized properly
+  	//Calling super() so that the object is initialized properly
       super(loc);
     }
-   
-  	//We want this to be just like a VerletParticle, only with a display() method.
+    //We want this to be just like a VerletParticle, only with a display() method.
     void display() {
       fill(175);
       stroke(0);
-  		//We’ve inherited x and y from VerletParticle!
+  	//We’ve inherited x and y from VerletParticle!
       ellipse(x,y,16,16);
     }
   }
   ```
-
+  
 * toxiclibs的弹簧类VerletSpring、VerletConstrainedSpring、VerletMinDistanceSpring，需要两个粒子进行初始化。
 
   ```java
@@ -1206,7 +1326,138 @@ box2d = new Box2DProcessing(this);
 
 5.17
 
-* 
+* 在Box2D中，如果我们忽略物理规律直接设置物体的位置，就会破坏物理生态，但是在toxiclibs中不存在这样的问题，我们可以手动设定粒子的位置，但是在这之前，最好调用`lock()`函数。
+
+* `lock()`函数用于锁定粒子，相当于Box2D中设置密度为0。下面我们来看看当鼠标点击的时候，我们锁定粒子、移动它、解锁以使它继续运动。
+
+  ```java
+  if (mousePressed) {
+  	//First lock the particle, then set the x and y, then unlock() it.
+      p2.lock();
+      p2.x = mouseX;
+      p2.y = mouseY;
+      p2.unlock();
+  }
+  ```
+
+5.18
+
+* 一根弹簧连接两个粒子作为基本元素，toxiclibs特别适合模拟柔软的物体。用弹簧连接的线性排列的粒子可以模拟一条线，用弹簧连接的网格排列的粒子可以模拟一张毯子，使用自定义的连接方式还可以模拟可爱又柔软的卡通形象。
+
+* 还是钟摆的例子，和第三章的刚性摆臂不同，这次我们用弹性摆臂。
+
+  ```java
+  //定义摆臂上的粒子列表
+  ArrayList<Particle> particles = new ArrayList<Particle>();
+  float len = 10;
+  float numParticles = 20;
+  //粒子水平排列
+  for(int i=0; i < numPoints; i++) {
+    Particle particle=new Particle(i*len,10);	//粒子水平排列
+    physics.addParticle(particle);	//将粒子添加到toxiclibs物理世界
+    particles.add(particle);
+    //相邻粒子用弹簧连接
+    if (i != 0) {
+      Particle previous = particles.get(i-1);
+      VerletSpring2D spring = new VerletSpring2D(particle,previous,len,strength);
+      physics.addSpring(spring);		////将弹簧添加到toxiclibs物理世界
+    }
+  }
+  ```
+
+  固定一端：
+
+  ```java
+  Particle head=particles.get(0);
+  head.lock();
+  ```
+
+5.19
+
+* 作者说：“I have a whole bunch of stuff I want to draw on the screen and I want all that stuff to be spaced out evenly in a nice, neat, organized manner. Otherwise I have trouble sleeping at night.”。试试力导图（force-directed graph）吧。
+
+* 我们将力导图中的粒子称为节点。首先，创建节点（Node）类：
+
+  ```java
+  class Node extends VerletParticle2D {
+    Node(Vec2D pos) {
+      super(pos);
+    }
+   
+    void display() {
+      fill(0,150);
+      stroke(0);
+      ellipse(x,y,16,16);
+    }
+  }
+  ```
+
+  接下来创建叫做簇（Cluster）的类，用来描述一系列的节点：
+
+  ```java
+  class Cluster {
+    ArrayList<Node> nodes;
+   
+    Cluster(int n, float d, Vec2D center) {
+      nodes = new ArrayList<Node>();
+      diameter = d;
+      for (int i = 0; i < n; i++) {
+  	  //围绕中心随机分布的点
+        nodes.add(new Node(center.add(Vec2D.randomVector())));
+        ...
+      }
+    }
+  ...
+  ```
+
+  然后将节点两两连接。注意两个细节：1 节点不用和自身连接；2 节点之间只需连接一次。
+
+  ```java
+  for (int i = 0; i < nodes.size()-1; i++) {
+    VerletParticle2D ni = nodes.get(i);
+    for (int j = i+1; j < nodes.size(); j++) {	//j从i+1开始
+      VerletParticle2D nj = nodes.get(j);
+      physics.addSpring(new VerletSpring2D(ni,nj,diameter,0.01));
+    }
+  }
+  ```
+
+5.20
+
+* Box2D有`applyForce()`，同样toxiclibs有`addForce()`，但是toxiclibs走的更远，它允许我们在粒子上添加共有的作用力，或者称作行为（behavior）。当我们在一个粒子上附加`AttractionBehavior `对象，系统中的所有其他粒子都会被吸引。假设有`class Particle extends VerletParticle`：
+
+  ```java
+  Particle p = new Particle(new Vec2D(200,200));
+  float distance = 20;	//作用力的半径
+  float strength = 0.1;
+  AttractionBehavior behavior = new AttractionBehavior(p, distance, strength);
+  physics.addBehavior(behavior);
+  ```
+
+* 尽管toxiclibs不能处理碰撞，但是我们可以通过AttractionBehavior来模拟：
+
+  ```java
+  class Particle extends VerletParticle2D {
+    float r;
+   
+    Particle (Vec2D loc) {
+      super(loc);
+      r = 4;
+  	//每当创建一个粒子，就生成一个AttractionBehavior并添加到物理世界。力的大小为负可表示斥力。
+      physics.addBehavior(new AttractionBehavior(this, r*4, -1));
+    }
+   
+    void display () {
+      fill (255);
+      stroke (255);
+      ellipse (x, y, r*2, r*2);
+    }
+  }
+  ```
+
+  
+
+
 
 
 
