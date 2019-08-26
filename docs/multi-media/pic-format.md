@@ -4,7 +4,7 @@
 
 ##### BMP示例
 
-<img src="./pic/bmp.png" alt="BMP示例" width="70%">
+<img src="./pic/BMP.png" alt="BMP示例" width="70%">
 
 #### Bitmap File Header
 
