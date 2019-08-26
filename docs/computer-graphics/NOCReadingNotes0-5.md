@@ -2,7 +2,7 @@
 
 [The Nature of Code示例代码](https://github.com/nature-of-code/noc-examples-processing)
 
-*注*：通过[本书主页]([https://natureofcode.com](https://natureofcode.com/))的下载按钮获取的示例代码包含过时的内容（比如第五章关于Box2DProcessing，旧版本名字为PBox2D），如果你已经从这里下载了，强烈建议通过上面的链接重新获取最新版本。
+*注*：通过[本书主页]([https://natureofcode.com](https://natureofcode.com/))的下载按钮获取的示例代码包含过时的内容（比如第五章关于Box2DProcessing，旧版本名字为PBox2D）。
 
 
 
