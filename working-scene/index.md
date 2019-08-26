@@ -1,2 +1,0 @@
-* [Maven Repository](./MavenRepo.html)
-
