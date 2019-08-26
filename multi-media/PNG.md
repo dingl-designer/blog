@@ -4,7 +4,7 @@
 
 ### PNG示例
 
-<img src="./pic/png.png" alt="BMP示例" width="70%">
+<img src="./pic/mm/png.png" alt="BMP示例" width="70%">
 
 #### File Header
 
