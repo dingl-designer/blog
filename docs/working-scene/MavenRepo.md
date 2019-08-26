@@ -23,12 +23,12 @@
 * 仓库分组的作用是将组内的多个仓库地址统一到同一个分组地址。
 * 代理仓库可看作是远程仓库在本主机上的缓存。理论上，获取阿里仓库的资源要比国外的资源更快，所以最好为阿里仓库创建一个代理仓库alicloud-proxy，仓库类型maven2(proxy)，代理地址<https://maven.aliyun.com/repository/public>，并添加到maven-public分组，maven-central之前。
 
-#### 开发者配置
+#### 配置相关
 
 - Maven项目的仓库信息可以在三个层次上进行定义：工程级别，in the project POM file（pom.xml）；用户级别，in Maven settings xml file（%USER_HOME%/.m2/settings.xml）；全局级别，in Maven global settings xml file（%M2_HOME%/conf/settings.xml）。覆盖范围越广，优先级越低。
 - 实际开发过程中，虽然可能存在多个settings.xml文件，但是只有配置到IDE中的那个settings.xml文件才生效。
 
-##### 检索配置
+#### 检索配置
 
 - 仓库替换（重定向），在settings.xml中设置
 
@@ -45,8 +45,7 @@
 
   在没有私有仓库的情况下，maven工程在进行资源检索时先到本地仓库检索，如果找不到就到中央仓库检索（中央仓库不需要显式配置）；当使用nexus搭建好私有仓库之后，上面的配置会将所有原本指向中央仓库的检索重定向到私有仓库。
 
-
-##### 发布配置
+#### 发布配置
 
 - 如果公司内部需要共享artifacts，可以将jar包发布到私有仓库。
 
@@ -84,4 +83,4 @@
 
 ##### 其他
 
-* 测试过程中遇到的问题：Mac版idea选择配置maven时，在Preferences菜单下配置生效，在Default settings菜单下配置不生效（差点被烦死）。
+* 测试过程中遇到的问题：Mac版Idea在修改maven配置文件路径时，在Default settings菜单下修改不生效，在Preferences菜单下修改生效。

@@ -10,3 +10,5 @@
 
 #### [运动粒子有限元法](./MPFEM2002.html)
 
+#### [The Nature of Code 读书笔记0-5](./computer-graphics/NOCReadingNotes0-5.html)
+
