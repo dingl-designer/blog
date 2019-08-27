@@ -1,4 +1,6 @@
-*注*：1 [原文链接](./MPFEM.pdf)
+*注*：
+
+1 译自：《Moving particle finite element method》Su Hao, Harold S. Park and Wing Kam Liu
 
 2 公式中符号字体（直体和斜体）严格按照原文复写，但是未发现两者之间的区别，比如$\mathrm x$和$x$。一般来讲，矩阵的符号都是直体。
 
