@@ -81,6 +81,3 @@
   </distributionManagement>
   ```
 
-##### 其他
-
-* 测试过程中遇到的问题：Mac版Idea在修改maven配置文件路径时，在Default settings菜单下修改不生效，在Preferences菜单下修改生效。
