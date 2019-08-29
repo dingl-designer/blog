@@ -539,7 +539,7 @@
 
 * 自相似是分形的关键特征，但一条线也是自相似的，但不是分形。分形的另一个特征是在小尺度上拥有精细的结构并且不能用欧几里得几何来描述。
 
-* 分形的另一个基本组件是递归，分形都有递归的定义。
+* 分形的另一个基本组件是递归（recursive【adj.】,recursion【n.】），分形都有递归的定义。
 
 8.2
 
@@ -606,11 +606,82 @@
 
 * 示例代码`NOC_8_06_Tree_static`是静态树，`NOC_8_06_Tree`则根据鼠标位置调整旋转角度，`Exercise_8_07_Tree`通过`float sw = map(len,2,120,1,10);`将线段宽度设置为长度的12分之1。
 
-* 本节的主题是随机性，我们加上随机的角度。`branch()`内部总是调用自己两次，调用随机次不行吗？示例代码`NOC_8_07_TreeStochastic`展示了随机生成的树，想要点击刷新的效果？注释掉`draw()`函数中的`noLoop()`。
+* 本节的主题是随机性，我们加上随机的角度。`branch()`内部总是调用自己两次，调用随机次不行吗？示例代码`NOC_8_07_TreeStochastic`展示了随机生成的树，点击刷新的效果没写好，需要更改下面三个函数：
 
-8.6
+  ```java
+  void setup() {
+    size(800, 200);
+    smooth();
+  }
+  void draw() {
+    newTree();
+    noLoop();
+  }
+  void mousePressed() {
+    redraw();	//重新调用draw()函数，配合包含noLoop()的draw()使用
+  }
+  ```
+
+8.6 L-systems 
+
+* L-系统是 Lindenmayer systems 的简称，他提供了跟踪复杂和多方面生长规则的分形结构的机制。
+
+* 在Processing中实现L-系统除了递归和转换，还需要习惯字符串（strings）的处理。L系统三个基本组件：
+
+  * 字母表（Alphabet）：L-系统的字母表由可包含的有效字符组成。
+  * 公理（Axiom）：公理是一个句子（由字母表中的字符构成），用于表示系统的初始状态。
+  * 规则（Rules）：规则应用于公理，并且递归应用，不断生成新的句子。规则包括两个句子，“被替代物”和“替代物”。
+
+* 和分形一样，我们可以称规则的一次替换应用称为一代（generation）。根据定义，第0代就是公理本身。
+
+* 补：虽然字符串用起来确实比字符数组（char[]）用起来方便，但是使用字符串也存在限制：在Java中，String有最大长度为Integer的最大值，即`2^31-1`；且String类是被`final`修饰的，意味着字符串一旦被创建就不能再更改，所以每次向字符串末尾添加字符实际上都是创建了一个新的字符串，这是很耗资源的。`StringBuffer`类专门用于解决后面这类问题。
+
+  ```java
+  StringBuffer next = new StringBuffer();
+  for (int i = 0; i < current.length(); i++) {
+      char c = current.charAt(i);
+      if (c == 'A') {		//注意这里是单引号
+          next.append("AB");
+      } else if (c == 'B') {
+          next.append("A");
+      }
+  }
+  current = next.toString();
+  ```
+
+* 这些生成的句子，其实是绘图说明。我们来转换一下：
+
+  * A：向前画一条线段。
+  * B：向前走一段距离但不画线。
+
+* 字母表”FG+-[]“是L-系统经常被用到。其含义已经对应的Processing代码为：
+
+  * F：画一条线段，并向前移动。code：`line(0,0,0,len); translate(0,len);`
+  * G：向前移动（不画线）。code：`translate(0,len);`
+  * +：向右转。code：`rotate(angle);`
+  * -：向左转。code：`rotate(-angle);`
+  * [：保存当前坐标。code：`pushMatrix();`
+  * ]：重载上一个坐标。code：`popMatrix();`
+
+* 接下来就是示例代码`NOC_8_09_LSystem`，可以运行看一下效果。该L-系统定义：
+
+  * 字母集：FG+-[]
+  * 公理：F
+  * 规则：F $\to$ FF+[+F-F-F]-[-F+F+F]，被替换的句子为“F”，原著多了个“-”符号，这点可以根据代码确认。
+
+* 植物应该是渐渐长高的，上面的示例代码为了让我们看清变化过程，每一代都占用了整个高度。可以将`Turtle`的`len`属性设置为一个较小的值，然后注释掉`turtle.changeLen(0.5)`，会得到一株渐渐长高的植物。实现简单，不贴代码。
+
+
+
+#### 9 代码的进化
 
 * 
+
+
+
+
+
+
 
 
 
