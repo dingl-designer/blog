@@ -691,7 +691,7 @@
 
 * 植物应该是渐渐长高的，上面的示例代码为了让我们看清变化过程，每一代都占用了整个高度。可以将`Turtle`的`len`属性设置为一个较小的值，然后注释掉`turtle.changeLen(0.5)`，会得到一株渐渐长高的植物。实现简单，不贴代码。
 
-#### 9 代码的进化（evolution）
+#### 9 The Evolution of Code
 
 * 将变量视作DNA，可以在代间传递。本章致力于研究生物进化背后的原理，并找到在代码中应用这些原则的方法。
 
@@ -727,8 +727,8 @@
 
 9.4
 
-* 基因算法第一步：创建族群。猴子打字的目标是进化出短语“cat”，如果现在有三个短语“hug” “rid” “won”，无论怎么拼接都不能得到“cat”，因为没有足够的多样性。大量的短语更有可能包含足够的属性来得到我们想要的结果。
-* 在遗传学领域，基因型（genotype）和表型（phenotype）是完全不同的概念。在我们的例子中，数字信息本身是成员的基因型，表型是该数据的表达。在编程过程中如何设计基因型和表型，最简单的例子是颜色，比如0表现为黑色，255表现为白色。在其他例子中，整数还可以表现为线段的长度、力的大小等。在我们的例子中，基因型和表现型都是字符串。
+* 基因算法第一步：创建族群（population）。猴子打字的目标是进化出短语“cat”，如果现在有三个短语“hug” “rid” “won”，无论怎么拼接都不能得到“cat”，因为没有足够的多样性。大量的短语更有可能包含足够的属性来得到我们想要的结果。
+* 在遗传学领域，基因型（genotype）和表型（phenotype）是完全不同的概念。在我们的例子中，数字信息本身是成员的基因型，表型是该数据的表达。在编程过程中如何设计基因型和表型，最简单的例子是颜色，比如0表现为黑色，255表现为白色。在其他例子中，整数还可以表现为线段的长度、力的大小等。
 * 我们这样总结第一步：创建一个包含N个成员的族群，每个成员携带随机生成的基因。
 
 9.5
@@ -740,7 +740,420 @@
 
 9.6
 
-* 
+* 根据达尔文的遗传原则，子女继承父母的属性。有很多方法可以应用，比如无性繁殖，选择一个个体并制作副本作为下一代，但是标准的做法是选择两个成员作为父母并通过以下步骤繁殖：
+  * 交配（crossover）。在当前例子中，我们可以选择父亲的前半段基因和母亲的后半段基因，拼接生成下一代。另一个变种方法是随机选择中点，即不一定恰好继承父母各方一半的基因。还有一种可能是每一个字符都从父母双方随机选取，就像抛硬币。
+  * 变异（mutation）：将产生的子女作为下一代之前还要经过最后一道工序，变异。变异是可选的，因为有时候不是必需的。突变使用比例来表示。在我们的例子中字符突变定义为选择一个新的字符。突变率可以定义为`0.5%` `1%`等，如果突变率太高（比如`80%`），否定了进化论本身，因为不能保证优秀的基因出现的几率更高。
+* 选择和繁殖的过程重复N次，直到获得N个新的成员，新的一代称为当前族群，并重复选择和繁殖的过程。
+* 在编写代码之前，总结一下整个过程：
+  * 第一步，初始化。创建N成员族群，成员携带随机基因。
+  * 循环：
+    * 第二步：选择。评估成员健康度并创建交配池。
+    * 第三步：繁殖。重复N次：
+      * 根据概率（通过健康度计算得到）选取两个成员作为父母。
+      * 交配-结合父母的基因产生后代。
+      * 变异-通过给定概率改变子女基因。
+      * 将新生子女加入下一代。
+    * 第四步：新一代取代上一代并回到第二步。
+
+9.7
+
+* 第一步：创建族群。大多数情况下族群成员数是固定的，我们可以使用数组（成员可变时用列表）。数组的每个元素是一个对象，我们称之基因。
+
+  ```java
+  class DNA {
+    char[] genes = new char[18];
+   
+    DNA() {
+      for (int i = 0; i < genes.length; i++) {
+  	//Picking randomly from a range of characters with ASCII values between 32 and 128. For more about ASCII: http://en.wikipedia.org/wiki/ASCII
+        genes[i] = (char) random(32,128);
+      }
+    }
+  }
+  ```
+
+  ```java
+  DNA[] population = new DNA[100];
+   
+  void setup() {
+    for (int i = 0; i < population.length; i++) {
+  	//Initializing each member of the population
+      population[i] = new DNA();
+    }
+  }
+  ```
+
+* 第二步：选择。在基因类内部添加健康度函数。
+
+  ```java
+  class DNA {
+    float fitness;
+  
+    void fitness () {
+      int score = 0;
+      for (int i = 0; i < genes.length; i++) {
+        if (genes[i] == target.charAt(i)) {	//Is the character correct?
+          score++;	//If so, increment the score.
+        }
+      }
+      fitness = float(score)/target.length();		Fitness is the percentage correct.
+    }
+  ...
+  ```
+
+  并在渲染的时候进行计算：
+
+  ```java
+  void draw() {
+    for (int i = 0; i < population.length; i++) {
+      population[i].fitness();
+    }
+  ...
+  ```
+
+  获取所有成员的健康度之后，就可以建立交配池。交配池是一个数据结构，我们不断的从中选取两个成员作为父母，健康度越高，被选中几率越高。如何实现“命运轮盘”呢？我们将创建一个桶（ArrayList），并将父母成员添加进桶N次，N是健康度得分（score）的百分点数。
+
+  ```java
+    ArrayList<DNA> matingPool = new ArrayList<DNA>();
+    for (int i = 0; i < population.length; i++) {
+    //n is equal to fitness times 100, which leaves us with an integer between 0 and 100.
+      int n = int(population[i].fitness * 100);
+      for (int j = 0; j < n; j++) {
+        //Add each member of the population to the mating pool N times.
+        matingPool.add(population[i]);
+      }
+    }
+  ```
+
+  Exercise 9.2：用于生成随机数的自定义分布的其他方法之一称为蒙特卡罗方法。 这种技术涉及挑选两个随机数，第二个数字作为限定数字，并确定是否应保留或丢弃第一个随机数。（关于这种方法可以查看[rejection sampling](https://en.wikipedia.org/wiki/Rejection_sampling)）
+
+  Exercise 9.3：有时成员健康度差别会很大，这时可以使用排名来计算选择概率。
+
+* 第三步：繁殖。首先选择两个成员作为父母。再次说明，两个成员不是必须的，你可以选择进行无性繁殖，或者挑选三个或四个作为父母。
+
+  ```java
+  int a = int(random(matingPool.size()));
+  int b = int(random(matingPool.size()));
+  DNA parentA = matingPool.get(a);
+  DNA parentB = matingPool.get(b);
+  ```
+
+  因为列表中可能有成员的多个实例，所以就可能选择了同一个成员两次。为了严格，可以添加额外的代码处理这种情况。（同时a,b本身可能相等，这种情况可以再生成新的随机数）
+
+  然后交配和变异：
+
+  ```java
+  DNA child = parentA.crossover(parentB);
+  child.mutate();
+  ```
+
+  使用“随机中点法”实现交配：
+
+  ```java
+  DNA crossover(DNA partner) {
+  	//child会有随机的DNA，但不用担心，后面会将其覆盖
+      DNA child = new DNA();
+  	//Picking a random “midpoint” in the genes array
+      int midpoint = int(random(genes.length));
+      for (int i = 0; i < genes.length; i++) {
+        if (i > midpoint) child.genes[i] = genes[i];
+        else child.genes[i] = partner.genes[i];
+      }
+      return child;
+  }
+  ```
+
+  下面是变异的函数，注意`1%`概率发生的实现方式：
+
+  ```java
+  float mutationRate = 0.01;
+  void mutate() {
+  	//处理基因中的每一个字符
+      for (int i = 0; i < genes.length; i++) {
+          if (random(1) < mutationRate) {
+              //Mutation, a new random character
+              genes[i] = (char) random(32,128);
+          }
+      }
+  }
+  ```
+
+9.8
+
+* 把代码整合在了一起，可以看示例代码`NOC_9_01_Shakespeare_simplified`。运行时可能会提示“Courier”字体找不到，这没什么关系。一个存在的问题是程序运行期间我们不能获得直观的感受，所以示例代码`NOC_9_01_Shakespeare`添加了一些统计学属性，让门们可以看到族群进化的过程。
+
+9.9
+
+* 使用遗传算法在应用程序之间迁移，核心机制不需要变，但是三个关键组件需要自定义。
+
+* 关键组件一：改变变量。前面的示例中有两个全局变量：
+
+  ```java
+  float mutationRate = 0.01;
+  int totalPopulation = 150;
+  ```
+
+  这两个值对族群行为有很大的影响，随意的给定值并不是好主意。根据实验数据可以得出一些结论。成员数量的增加可以减少获取最终短语所需的代数，但不一定能缩短时间，成员数量过大会使程序运行缓慢。突变率也会产生影响，如果突变率为零，你只能期待足够幸运能够拥有合适的初始值，否则可能永远获取不到正确的短语，而如果突变率为`10%`，你则需要等待更长的时间。
+
+* 关键组件二：健康度函数。上面的桶的例子是有缺陷的，健康度`80%`和`80.1%`的成员都向桶中添加80次，他们被选取的概率相等。我们来看一下现在的健康度函数，正确字符数和健康度是线性关系，如何让健康度随着正确字符数的增长成倍增长呢？让健康度和正确字符数的平方正相关。另外一个方式，让健康度和2的“正确字符数”次幂正相关。
+
+* 讨论线性性相关和指数相关固然重要，但是还有更重要的问题，在你的实验中健康度未必总和字符串相关。游戏中的电脑玩家也是常见场景，假设用户玩家是守门员，其他玩家是由你的计算机程序控制的，电脑玩家的健康度和其得分数相关。得分越多的电脑玩家出现在下一局的几率会更高。而当用户玩家更换时，电脑玩家的健康度会明显降低并可是新的进化。这个场景展示了一个非常强大的东西-系统的适应性。
+
+* 关键组件三：基因型和表型。基因型类`DNA`会包含一个参数数组，以便能够迭代应用`crossover()`和`mutate()`函数。
+
+  ```java
+  class DNA {
+    float[] genes;
+  
+    DNA(int num) {
+      genes = new float[num];
+      for (int i = 0; i < genes.length; i++) {
+        genes[i] = float(1);	//Always pick a number between 0 and 1.
+      }
+    }
+  ...
+  ```
+
+  表型类是不同的类，比如`Vehicle`，能够被基因类控制其表象或行为，为了建立这种关系，在`Vehicle`中维护一个`DNA`类的示例。
+
+  ```java
+  class Vehicle {
+    DNA dna;
+   
+    float maxspeed;
+    float maxforce;
+    float size;
+    float separationWeight;
+  ... 
+    Vehicle() {
+      DNA = new DNA(4);
+  	//Using the genes to set variables
+      maxspeed = dna.genes[0];
+      maxforce = dna.genes[1];
+      size = dna.genes[2];
+      separationWeight = dna.genes[3];
+  ...
+    }
+  ```
+
+  基因的每个元素都在0到1取值，但是这个范围也许不能满足参数的实际需求，此时借助map函数会很方便：
+
+  ```java
+  size = map(dna.genes[2],0,1,10,72);
+  ```
+
+  而在另外一些情况下，你想要的基因是一个对象数组，比如火箭的一系列推进器，这时基因数组的每个元素是具有方向和大小属性的PVector。
+
+  ```java
+  class DNA {
+    PVector[] genes;
+   
+    DNA(int num) {
+      genes = new float[num];
+      for (int i = 0; i < genes.length; i++) {
+        genes[i] = PVector.random2D();	//A PVector pointing in a random direction
+        genes[i].mult(random(10));	//And scaled randomly
+      }
+    }
+  ...
+  ```
+
+9.10
+
+* 智能火箭（Smart Rockets）。Jer Thorp指出NASA使用进化计算技术来解决各种问题，从卫星天线设计到火箭发射模式。 这激发了他创造了不断发展的火箭的Flash演示。 场景的说明：
+
+  * 一组火箭从屏幕底部发射企图撞击屏幕顶部的一个目标（障碍物阻挡了直线行进路线）。
+  * 每枚火箭都配备了五个可变强度和方向的推进器。 推进器不会一次连续推进; 相反，他们以自定义序列一次一个地工作。
+
+* 受Jer Thorp启发，本节我们发明了自己的智能火箭。我们的火箭只有一个推进器，并在每帧的运动中都可以向任何方向以任何大小的力推进。将第2章的Mover类重命名为Rocket，并在`draw()`函数中调用`applyForce()`实现推进。
+
+* 让我们重新审视9.9节总结的三个关键组件：
+
+  * 成员数量和变异率。暂定为成员数量100，变异率1%。
+
+  * 健康度函数。因为我们的目标是到达目的地。所以离目的地越近，健康度越高。我们前面讨论过平方的使用，所以
+
+    ```java
+    void fitness() {
+        float d = PVector.dist(location,target);
+        fitness = pow(1/d,2);
+    }
+    ```
+
+  * 基因型和表型。猴子打字的基因类在这里我们需要改一下基因组的类型
+
+    ```java
+    class DNA{
+    	PVector[] genes;
+    ...
+    ```
+
+    然后考虑一下随机基因的初始化：
+
+    ```java
+    PVector v = new PVector(random(-1,1),random(-1,1));
+    ```
+
+    如果是这样，将生成一些如图9.12所示的向量，在各个方向上向量大小不一致，所以这样：
+
+    ```java
+    for (int i = 0; i < genes.length; i++) {
+      //random2D()生成一个随机角度的单位向量，如图9.13
+      genes[i] = PVector.random2D();
+    }
+    ```
+
+    单位向量的力事实上有点大，我们在基因类中添加阈值：
+
+    ```java
+    class DNA {
+      PVector[] genes;
+      float maxforce = 0.1;
+     
+      DNA() {
+        //We need a PVector for every frame of the rocket’s life.
+        genes = new PVector[lifetime];
+        for (int i = 0; i < genes.length; i++) {
+          genes[i] = PVector.random2D();
+          genes[i].mult(random(0, maxforce));
+        }
+      }
+    ...
+    ```
+
+    需要注意到我们创建了和火箭寿命等长的数组，在火箭寿命的每一帧都需要记录一个PVector。
+
+    表型-火箭类是从第2章的Mover类得到的，需要向其中添加基因和健康度属性以及健康度评估函数。
+
+    ```java
+    class Rocket {
+      DNA dna;
+      float fitness;
+    ...
+    ```
+
+    以及基因的应用：
+
+    ```java
+    int geneCounter = 0;
+    void run() {
+        applyForce(dna.genes[geneCounter]);		//Apply a force from the genes array.
+        geneCounter++;	//Go to the next force in the genes array.
+        update();	//Update the Rocket’s physics.
+    }
+    ```
+
+9.11
+
+* 现在就差族群（Population）类了，莎士比亚猴子的族群类在建立交配池和产生后代的方法完全一致，重要的改变是，猴子的字符串一旦生成就可以评估健康度，但是火箭必须存活一段时间才能评估健康度。所以向族群类中添加`run()`函数进行物理模拟，完成更新坐标和渲染操作。
+
+  ```java
+  void live () {
+      for (int i = 0; i < population.length; i++) {
+          //The run function takes care of the forces, updating the rocket’s location, and displaying it.
+          population[i].run();
+      }
+  }
+  ```
+
+* 和莎士比亚的例子不同，我们不需要每帧都进行族群的繁殖，我们的步骤如下：
+
+  * 创建族群；
+  * 火箭生存N帧；
+  * 进化出下一代：选择、繁殖；
+  * 回到第二步。
+
+* 示例代码：`NOC_9_02_SmartRockets_superbasic`。但这并不有趣，下面我们讨论两个改进的地方，并提供代码片段。
+
+* 改进一：添加障碍物。添加障碍物类，并写一个函数检测火箭是否撞上了障碍物：：
+
+  ```java
+  class Obstacle {
+    //An obstacle is a location (top left corner of rectangle) with a width and height.
+    PVector location;
+    float w,h;
+      
+    boolean contains(PVector v) {
+      if (v.x > location.x && v.x < location.x + w && v.y > location.y && v.y < location.y + h) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  ...
+  ```
+
+  假设有很多个障碍物，火箭类中添加方法检测是否撞击，并使用布尔值`stopped`记录：
+
+  ```java
+  void obstacles() {
+      for (Obstacle obs : obstacles) {
+          if (obs.contains(location)) {
+              stopped = true;
+          }
+      }
+  }
+  ```
+
+  如果发生撞击，我们就停止更新它的坐标：
+
+  ```java
+  void run() {
+      if (!stopped) {
+        applyForce(dna.genes[geneCounter]);
+        geneCounter = (geneCounter + 1) % dna.genes.length;
+        update();
+        obstacles();
+      }
+  }
+  ```
+
+  如果发生撞击，健康度会很低：
+
+  ```java
+  void fitness() {
+      float d = dist(location.x, location.y, target.location.x, target.location.y);
+      fitness = pow(1/d, 2);
+      if (stopped) fitness *= 0.1;
+  }
+  ```
+
+* 改进二：更快得到达目标。前面的例子中，火箭行的并没有因为更快得到达目标而获得奖励；如果火箭更快得接近目标并超过了目标可能会受到惩罚，最终的结果是，缓慢而稳定的火箭将会获胜。
+
+  同样，可以用很多方法。比如可以使用火箭在任意时刻的最短距离，而不是结束时刻的最短距离，称之为火箭的距离纪录。其次，火箭应该因为更快地到达目标获得奖励。可以再火箭类中添加计时器，用于记录到达目标的时间，并且时间越短，评估的健康度越高。
+
+  ```java
+  void checkTarget() {
+      float d = dist(location.x, location.y, target.location.x, target.location.y);
+      if (d < recordDist) recordDist = d;
+      
+      if (target.contains(location)) {
+        hitTarget = true;
+      } else if (!hitTarget) {
+        finishTime++;
+      }
+  }
+  ```
+
+  ```java
+  void fitness() {
+      fitness = (1/(finishTime*recordDist));
+      fitness = pow(fitness, 2);
+   
+      if (stopped) fitness *= 0.1;
+      if (hitTarget) fitness *= 2;	//You are rewarded for reaching the target.
+  }
+  ```
+
+* 另外一个著名的基因算法的实现是Karl Sims的虚拟生物进化（Evolved Virtual Creatures）。评估一个虚拟生物族群完成特定任务（比如游泳、跑步、跳跃、争夺箱子）的能力。Karl Sims的创新之处在于基于节点（node-based）的基因型，即基因不是字符或向量的线性列表，而是节点的位图。
+
+9.12
+
+* 互动选择。
+
+
+
+
 
 
 
