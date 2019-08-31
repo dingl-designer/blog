@@ -1,3 +1,5 @@
+*注*：1 第九和第十章的在线示例长时间运行会非常占用电脑资源，所以每当你看完一个示例演示之后，可以点一下左下角的PAUSE按钮。
+
 #### 6 自动代理
 
 *名词解释*：
@@ -1502,8 +1504,290 @@
 10.6
 
 * 如果你阅读人工智能的书籍，它会说感知机只能处理线性可分问题，比如点线位置关系的例子。图10.11中，左侧图的两种颜色的点可以用直线分开，他是线性可分的；右侧点则不能。
-* 最简单的非线性可分的例子是“XOR”，或称为“异或（Exclusive or）”。看图10.13的真值表。XOR相当于OR且NOT AND：$p\oplus q = (p\lor q)\land \lnot (p\land q)$，即“一真一假才为真”。
-* 感知机甚至不能解决异或问题，但是如果用两个感知机组成网呢，一个感知机处理OR，另一个感知机处理NOT AND。图10.14被称为多层（multi-layered）感知机。
+* 最简单的非线性可分的例子是“XOR”，或称为“异或（Exclusive or）”。看图10.13的真值表。XOR相当于OR且NOT AND：$p\oplus q = (p\lor q)\land \lnot (p\land q)$，即“一真一假才为真”。感知机甚至不能解决异或问题，但是如果用两个感知机组成网呢，一个感知机处理OR，另一个感知机处理NOT AND。
+* 图10.14被称为多层（multi-layered）感知机。由很多个神经元组成，一些是输入神经元，专门接收输入数据，一些作为隐藏层的组成部分（因为他们既不直接接收输入，又不直接给出输出），剩下的是输出神经元，是我们读取输出数据的地方。
+* 训练这种神经网络要复杂得多。因为有很多连接，并且处于不同的层，如何得知每个神经元或者连接对整体误差的贡献有多大呢？优化多层网络权重值的解决方案称为反向传播。输入和前馈的过程是一样的，不同之处在于数据在到达输出神经元之前要通过一层额外的神经元。训练依旧依赖于误差，然而，误差必须通过网络反向传播。最终误差用于调整所有连接的权重。反向传播有点超出了本书的范围，涉及更高级的激活函数（称为sigmoid函数）以及一些基本的微积分。
+* 我们将专注于构建网络的可视化架构的代码框架。 我们将创建Neuron对象和Connection对象，进而创建Network对象并设置动画以显示前馈进程。 这将与我们在第5章（toxiclibs）中研究的一些力导向图示例非常相似。
+
+10.7
+
+* 接下来我们的目标是创建如10.15所示的网络图。
+
+* 神经元类描述一个坐标实体：
+
+  ```java
+  class Neuron {
+    PVector location;
+    Neuron(float x, float y) {
+      location = new PVector(x, y);
+    }
+    void display() {
+      stroke(0);
+      fill(0);
+      ellipse(location.x, location.y, 16, 16);
+    }
+  }
+  ```
+
+  网络类管理神经元列表，以及自己的坐标：
+
+  ```java
+  class Network {
+    ArrayList<Neuron> neurons;
+    PVector location;
+   
+    Network(float x, float y) {
+      location = new PVector(x,y);
+      neurons = new ArrayList<Neuron>();
+    }
+  
+    void addNeuron(Neuron n) {
+      neurons.add(n);
+    }
+  
+    void display() {
+      pushMatrix();
+      translate(location.x, location.y);
+      for (Neuron n : neurons) {
+        n.display();
+      }
+      popMatrix();
+    }
+  }
+  
+  ```
+
+  现在可以简单的画一下：
+
+  ```java
+  Network network;
+   
+  void setup() {
+    size(640, 360);
+    network = new Network(width/2,height/2);
+  
+    Neuron a = new Neuron(-200,0);
+    Neuron b = new Neuron(0,100);
+    Neuron c = new Neuron(0,-100);
+    Neuron d = new Neuron(200,0);
+  
+    network.addNeuron(a);
+    network.addNeuron(b);
+    network.addNeuron(c);
+    network.addNeuron(d);
+  }
+   
+  void draw() {
+    background(255);
+    network.display();
+  }
+  ```
+
+  没错，还少了连接类。连接类有三个元素组成：两个神经元以及权重值：
+
+  ```java
+  class Connection {
+  A connection is between two neurons.
+    Neuron a;
+    Neuron b;
+    float weight;
+   
+    Connection(Neuron from, Neuron to,float w) {
+      weight = w;
+      a = from;
+      b = to;
+    }
+  
+    void display() {
+      stroke(0);
+      //权重表现为线段的宽度
+      strokeWeight(weight*4);
+      line(a.location.x, a.location.y, b.location.x, b.location.y);
+    }
+  }
+  ```
+
+  有了连接类，我们想着创建神经元后连接神经元：
+
+  ```java
+  void setup() {
+    size(640, 360);
+    network = new Network(width/2,height/2);
+   
+    Neuron a = new Neuron(-200,0);
+    Neuron b = new Neuron(0,100);
+    Neuron c = new Neuron(0,-100);
+    Neuron d = new Neuron(200,0);
+   
+  	//Making connections between the neurons
+    network.connect(a,b);
+    network.connect(a,c);
+    network.connect(b,d);
+    network.connect(c,d);
+   
+    network.addNeuron(a);
+    network.addNeuron(b);
+    network.addNeuron(c);
+    network.addNeuron(d);
+  }
+  ```
+
+  所以网络类要维护连接的列表吗，向管理神经元一样？不是的。因为我们要显示前馈过程，所以每个神经元最好知道他后面连接了谁。
+
+  ```java
+  void connect(Neuron a, Neuron b) {
+    Connection c = new Connection(a, b, random(1));
+    a.addConnection(c);
+  }
+  ```
+
+  上面的代码，神经元b不必知道他的前面是谁，因为我们不演示反向传播。
+
+  神经元接收并保存连接，渲染时调用连接的渲染：
+
+  ```java
+  class Neuron {
+    PVector location;
+    ArrayList<Connection> connections;
+   
+    Neuron(float x, float y) {
+      location = new PVector(x, y);
+      connections = new ArrayList<Connection>();
+    }
+    
+    void addConnection(Connection c) {
+      connections.add(c);
+    }
+    
+    void display() {
+      stroke(0);
+      strokeWeight(1);
+      fill(0);
+      ellipse(location.x, location.y, 16, 16);
+   
+      for (Connection c : connections) {	//Drawing all the connections
+        c.display();
+      }
+    }
+  ...
+  ```
+
+10.8
+
+* 为了演示前馈过程，我们希望看到数据的流动。加入我们希望这样像网络输入：
+
+  ```java
+  network.feedforward(random(1));
+  ```
+
+  网络类选择第一个神经元接收输入：
+
+  ```java
+  class Network {
+    void feedforward(float input) {
+      Neuron start = neurons.get(0);
+      start.feedforward(input);
+    }
+  ...
+  ```
+
+  在接到输入数据时，神经元的标准处理方式是将其累加，并通过一个简单的激活函数（是否大于1）判断是否触发下一步行为：
+
+  ```java
+  class Neuron
+    int sum = 0;
+    void feedforward(float input) {
+      sum += input;
+      if (sum > 1) {
+        fire();
+        sum = 0;
+      }
+    }
+  ...
+  ```
+
+  `fire()`函数做什么呢？通过连接向前传递：
+
+  ```java
+  void fire() {
+    for (Connection c : connections) {
+      c.feedforward(sum);
+    }
+  }
+  ```
+
+  因为连接都有权重，我们很容易想到应该根据权重来传递数据：
+
+  ```java
+  class Connection {
+    void feedforward(float val) {
+      b.feedforward(val*weight);
+    }
+  ...
+  ```
+
+  但是我们实际上是想直观的看到数据从`a`到`b`的移动过程。首先数据从`a`出发：
+
+  ```java
+  PVector sender = a.location.get();
+  ```
+
+  我们可以用很多运动算法实现移动的过程，这里我们使用简单的插值函数：
+
+  ```java
+  sender.x = lerp(sender.x, b.location.x, 0.1);
+  sender.y = lerp(sender.y, b.location.y, 0.1);
+  ```
+
+  有了坐标，我们就可以画当前帧的数据：
+
+  ```java
+  ellipse(sender.x, sender.y, 8, 8);
+  ```
+
+  我们还需要一个布尔值记录信号是否正在传播：
+
+  ```java
+  class Connection {
+    boolean sending = false;
+    PVector sender;
+    float output;
+   
+    void feedforward(float val) {
+      sending = true;
+      sender = a.location.get();
+      output = val*weight;
+    }
+  ...
+  ```
+
+  当连接被激活时立即调用`feedforward()`函数，并且每次渲染（`draw()`）时更新传播中的数据的位置，Connection类还要提供一个更新函数：
+
+  ```java
+  void update() {
+    if (sending) {
+      sender.x = lerp(sender.x, b.location.x, 0.1);
+      sender.y = lerp(sender.y, b.location.y, 0.1);
+  
+      float d = PVector.dist(sender, b.location);
+      //当距离足够近时，停止传播动画
+      if (d < 1) {
+        b.feedforward(output);
+        sending = false;
+      }
+    }
+  }
+  ```
+
+* 见示例代码：`NOC_10_04_NetworkAnimation`。
+
+
+
+#### 结束语：
+
+​	本书结束了，但是几乎没有触及到我们生活的世界和模拟它的技术。我希望将来会添加新的教程和示例。
+
+
 
 
 
