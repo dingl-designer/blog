@@ -73,9 +73,9 @@
 
   ```java
   static public float angleBetween(PVector v1, PVector v2) {
-      float dot = v1.dot(v2);
-      float theta = (float) Math.acos(dot / (v1.mag() * v2.mag()));
-      return theta;
+    float dot = v1.dot(v2);
+    float theta = (float) Math.acos(dot / (v1.mag() * v2.mag()));
+    return theta;
   }
   ```
 
@@ -85,12 +85,12 @@
 
   ```java
   void display() {  // Display the path.
-      strokeWeight(radius*2);		//画宽度为radius*2的路径
-      stroke(0,100);
-      line(start.x,start.y,end.x,end.y);
-      strokeWeight(1);		//画中线
-      stroke(0);
-      line(start.x,start.y,end.x,end.y);
+    strokeWeight(radius*2);		//画宽度为radius*2的路径
+    stroke(0,100);
+    line(start.x,start.y,end.x,end.y);
+    strokeWeight(1);		//画中线
+    stroke(0);
+    line(start.x,start.y,end.x,end.y);
   }
   ```
 
@@ -140,24 +140,24 @@
 
   ```java
   void display() {
-      // Draw thick line for radius
-      stroke(175);
-      strokeWeight(radius*2);
-      noFill();
-      beginShape();
-      for (PVector v : points) {
-        vertex(v.x, v.y);
-      }
-      endShape();
-      // Draw thin line for center of path
-      stroke(0);
-      strokeWeight(1);
-      noFill();
-      beginShape();
-      for (PVector v : points) {
-        vertex(v.x, v.y);
-      }
-      endShape();
+    // Draw thick line for radius
+    stroke(175);
+    strokeWeight(radius*2);
+    noFill();
+    beginShape();
+    for (PVector v : points) {
+      vertex(v.x, v.y);
+    }
+    endShape();
+    // Draw thin line for center of path
+    stroke(0);
+    strokeWeight(1);
+    noFill();
+    beginShape();
+    for (PVector v : points) {
+      vertex(v.x, v.y);
+    }
+    endShape();
   }
   ```
 
@@ -176,29 +176,29 @@
 
   ```java
   void separate (ArrayList<Vehicle> vehicles) {
-  	//Note how the desired separation is based on the Vehicle’s size.
-      float desiredseparation = r*2;
-      PVector sum = new PVector();
-      int count = 0;
-      for (Vehicle other : vehicles) {
-        float d = PVector.dist(location, other.location);
-        if ((d > 0) && (d < desiredseparation)) {
-          PVector diff = PVector.sub(location, other.location);
-          diff.normalize();
-  		//What is the magnitude of the PVector pointing away from the other vehicle? The closer it is, the more we should flee. The farther, the less. So we divide by the distance to weight it appropriately.
-          diff.div(d);
-          sum.add(diff);
-          count++;
-        }
+    //Note how the desired separation is based on the Vehicle’s size.
+    float desiredseparation = r*2;
+    PVector sum = new PVector();
+    int count = 0;
+    for (Vehicle other : vehicles) {
+      float d = PVector.dist(location, other.location);
+      if ((d > 0) && (d < desiredseparation)) {
+        PVector diff = PVector.sub(location, other.location);
+        diff.normalize();
+        //What is the magnitude of the PVector pointing away from the other vehicle? The closer it is, the more we should flee. The farther, the less. So we divide by the distance to weight it appropriately.
+        diff.div(d);
+        sum.add(diff);
+        count++;
       }
-      if (count > 0) {
-        sum.div(count);	//这个有必要吗，后面是normalize
-        sum.normalize();
-        sum.mult(maxspeed);
-        PVector steer = PVector.sub(sum, vel);
-        steer.limit(maxforce);
-        applyForce(steer);
-      }
+    }
+    if (count > 0) {
+      sum.div(count);	//这个有必要吗，后面是normalize
+      sum.normalize();
+      sum.mult(maxspeed);
+      PVector steer = PVector.sub(sum, vel);
+      steer.limit(maxforce);
+      applyForce(steer);
+    }
   }
   ```
 
@@ -208,11 +208,11 @@
 
   ```java
   void applyBehaviors(ArrayList<Vehicle> vehicles) {
-      PVector separate = separate(vehicles);
-      PVector seek = seek(new PVector(mouseX,mouseY));
-  	//We have to apply the force here since seek() and separate() no longer do so.
-      applyForce(separate);
-      applyForce(seek);
+    PVector separate = separate(vehicles);
+    PVector seek = seek(new PVector(mouseX,mouseY));
+    //We have to apply the force here since seek() and separate() no longer do so.
+    applyForce(separate);
+    applyForce(seek);
   }
   ```
 
@@ -222,18 +222,18 @@
 
   ```java
   void flock(ArrayList<Boid> boids) {
-  	//The three flocking rules
-      PVector sep = separate(boids);
-      PVector ali = align(boids);
-      PVector coh = cohesion(boids);
-  	//Arbitrary weights for these forces (Try different ones!)
-      sep.mult(1.5);
-      ali.mult(1.0);
-      coh.mult(1.0);
-  	//Applying all the forces
-      applyForce(sep);
-      applyForce(ali);
-      applyForce(coh);
+    //The three flocking rules
+    PVector sep = separate(boids);
+    PVector ali = align(boids);
+    PVector coh = cohesion(boids);
+    //Arbitrary weights for these forces (Try different ones!)
+    sep.mult(1.5);
+    ali.mult(1.0);
+    coh.mult(1.0);
+    //Applying all the forces
+    applyForce(sep);
+    applyForce(ali);
+    applyForce(coh);
   }
   ```
 
@@ -241,29 +241,29 @@
 
   ```java
   PVector align (ArrayList<Boid> boids) {
-  	//This is an arbitrary value and could vary from boid to boid.
-      float neighbordist = 50;
-      PVector sum = new PVector(0,0);
-      int count = 0;
-      for (Boid other : boids) {
-        float d = PVector.dist(location,other.location);
-        if ((d > 0) && (d < neighbordist)) {
-          sum.add(other.velocity);
-  		//For an average, we need to keep track of how many boids are within the distance.
-          count++;
-        }
+    //This is an arbitrary value and could vary from boid to boid.
+    float neighbordist = 50;
+    PVector sum = new PVector(0,0);
+    int count = 0;
+    for (Boid other : boids) {
+      float d = PVector.dist(location,other.location);
+      if ((d > 0) && (d < neighbordist)) {
+        sum.add(other.velocity);
+        //For an average, we need to keep track of how many boids are within the distance.
+        count++;
       }
-      if (count > 0) {
-        sum.div(count);	//同样，这个有必要吗，后面是normalize
-        sum.normalize();
-        sum.mult(maxspeed);
-        PVector steer = PVector.sub(sum,velocity);
-        steer.limit(maxforce);
-        return steer;
-      } else {
-        //If we don’t find any close boids, the steering force is zero.
-        return new PVector(0,0);
-      }
+    }
+    if (count > 0) {
+      sum.div(count);	//同样，这个有必要吗，后面是normalize
+      sum.normalize();
+      sum.mult(maxspeed);
+      PVector steer = PVector.sub(sum,velocity);
+      steer.limit(maxforce);
+      return steer;
+    } else {
+      //If we don’t find any close boids, the steering force is zero.
+      return new PVector(0,0);
+    }
   }
   ```
 
@@ -271,24 +271,24 @@
 
   ```java
   PVector cohesion (ArrayList<Boid> boids) {
-      float neighbordist = 50;
-      PVector sum = new PVector(0,0);
-      int count = 0;
-      for (Boid other : boids) {
-        float d = PVector.dist(location,other.location);
-        if ((d > 0) && (d < neighbordist)) {
-  		//Adding up all the others’ locations
-          sum.add(other.location);
-          count++;
-        }
+    float neighbordist = 50;
+    PVector sum = new PVector(0,0);
+    int count = 0;
+    for (Boid other : boids) {
+      float d = PVector.dist(location,other.location);
+      if ((d > 0) && (d < neighbordist)) {
+        //Adding up all the others’ locations
+        sum.add(other.location);
+        count++;
       }
-      if (count > 0) {
-        sum.div(count);
-  	  //Here we make use of the seek() function we wrote in Example 6.8. The target we seek is the average location of our neighbors.
-        return seek(sum);
-      } else {
-        return new PVector(0,0);
-      }
+    }
+    if (count > 0) {
+      sum.div(count);
+      //Here we make use of the seek() function we wrote in Example 6.8. The target we seek is the average location of our neighbors.
+      return seek(sum);
+    } else {
+      return new PVector(0,0);
+    }
   }
   ```
 
@@ -630,13 +630,13 @@
   
   int rand(void)                        // 生成伪随机数
   {
-      next = next * 1103515245 + 12345;
-      return (unsigned int) (next / 65536) % 32768;
+    next = next * 1103515245 + 12345;
+    return (unsigned int) (next / 65536) % 32768;
   }
   
   void srand(unsigned int seed)         // 修改种
   {
-      next = seed;
+    next = seed;
   }
   ```
 
@@ -659,12 +659,12 @@
   ```java
   StringBuffer next = new StringBuffer();
   for (int i = 0; i < current.length(); i++) {
-      char c = current.charAt(i);
-      if (c == 'A') {		//注意这里是单引号
-          next.append("AB");
-      } else if (c == 'B') {
-          next.append("A");
-      }
+    char c = current.charAt(i);
+    if (c == 'A') {		//注意这里是单引号
+      next.append("AB");
+    } else if (c == 'B') {
+      next.append("A");
+    }
   }
   current = next.toString();
   ```
@@ -814,15 +814,15 @@
   获取所有成员的健康度之后，就可以建立交配池。交配池是一个数据结构，我们不断的从中选取两个成员作为父母，健康度越高，被选中几率越高。如何实现“命运轮盘”呢？我们将创建一个桶（ArrayList），并将父母成员添加进桶N次，N是健康度得分（score）的百分点数。
 
   ```java
-    ArrayList<DNA> matingPool = new ArrayList<DNA>();
-    for (int i = 0; i < population.length; i++) {
+  ArrayList<DNA> matingPool = new ArrayList<DNA>();
+  for (int i = 0; i < population.length; i++) {
     //n is equal to fitness times 100, which leaves us with an integer between 0 and 100.
-      int n = int(population[i].fitness * 100);
-      for (int j = 0; j < n; j++) {
-        //Add each member of the population to the mating pool N times.
-        matingPool.add(population[i]);
-      }
+    int n = int(population[i].fitness * 100);
+    for (int j = 0; j < n; j++) {
+      //Add each member of the population to the mating pool N times.
+      matingPool.add(population[i]);
     }
+  }
   ```
 
   Exercise 9.2：用于生成随机数的自定义分布的其他方法之一称为蒙特卡罗方法。 这种技术涉及挑选两个随机数，第二个数字作为限定数字，并确定是否应保留或丢弃第一个随机数。（关于这种方法可以查看[rejection sampling](https://en.wikipedia.org/wiki/Rejection_sampling)）
@@ -851,15 +851,15 @@
 
   ```java
   DNA crossover(DNA partner) {
-  	//child会有随机的DNA，但不用担心，后面会将其覆盖
-      DNA child = new DNA();
-  	//Picking a random “midpoint” in the genes array
-      int midpoint = int(random(genes.length));
-      for (int i = 0; i < genes.length; i++) {
-        if (i > midpoint) child.genes[i] = genes[i];
-        else child.genes[i] = partner.genes[i];
-      }
-      return child;
+    //child会有随机的DNA，但不用担心，后面会将其覆盖
+    DNA child = new DNA();
+    //Picking a random “midpoint” in the genes array
+    int midpoint = int(random(genes.length));
+    for (int i = 0; i < genes.length; i++) {
+      if (i > midpoint) child.genes[i] = genes[i];
+      else child.genes[i] = partner.genes[i];
+    }
+    return child;
   }
   ```
 
@@ -868,13 +868,13 @@
   ```java
   float mutationRate = 0.01;
   void mutate() {
-  	//处理基因中的每一个字符
-      for (int i = 0; i < genes.length; i++) {
-          if (random(1) < mutationRate) {
-              //Mutation, a new random character
-              genes[i] = (char) random(32,128);
-          }
+    //处理基因中的每一个字符
+    for (int i = 0; i < genes.length; i++) {
+      if (random(1) < mutationRate) {
+        //Mutation, a new random character
+        genes[i] = (char) random(32,128);
       }
+    }
   }
   ```
 
@@ -975,8 +975,8 @@
 
     ```java
     void fitness() {
-        float d = PVector.dist(location,target);
-        fitness = pow(1/d,2);
+      float d = PVector.dist(location,target);
+      fitness = pow(1/d,2);
     }
     ```
 
@@ -1037,9 +1037,9 @@
     ```java
     int geneCounter = 0;
     void run() {
-        applyForce(dna.genes[geneCounter]);		//Apply a force from the genes array.
-        geneCounter++;	//Go to the next force in the genes array.
-        update();	//Update the Rocket’s physics.
+      applyForce(dna.genes[geneCounter]);		//Apply a force from the genes array.
+      geneCounter++;	//Go to the next force in the genes array.
+      update();	//Update the Rocket’s physics.
     }
     ```
 
@@ -1049,10 +1049,10 @@
 
   ```java
   void live () {
-      for (int i = 0; i < population.length; i++) {
-          //The run function takes care of the forces, updating the rocket’s location, and displaying it.
-          population[i].run();
-      }
+    for (int i = 0; i < population.length; i++) {
+      //The run function takes care of the forces, updating the rocket’s location, and displaying it.
+      population[i].run();
+    }
   }
   ```
 
@@ -1087,11 +1087,11 @@
 
   ```java
   void obstacles() {
-      for (Obstacle obs : obstacles) {
-          if (obs.contains(location)) {
-              stopped = true;
-          }
+    for (Obstacle obs : obstacles) {
+      if (obs.contains(location)) {
+        stopped = true;
       }
+    }
   }
   ```
 
@@ -1099,12 +1099,12 @@
 
   ```java
   void run() {
-      if (!stopped) {
-        applyForce(dna.genes[geneCounter]);
-        geneCounter = (geneCounter + 1) % dna.genes.length;
-        update();
-        obstacles();
-      }
+    if (!stopped) {
+      applyForce(dna.genes[geneCounter]);
+      geneCounter = (geneCounter + 1) % dna.genes.length;
+      update();
+      obstacles();
+    }
   }
   ```
 
@@ -1112,9 +1112,9 @@
 
   ```java
   void fitness() {
-      float d = dist(location.x, location.y, target.location.x, target.location.y);
-      fitness = pow(1/d, 2);
-      if (stopped) fitness *= 0.1;
+    float d = dist(location.x, location.y, target.location.x, target.location.y);
+    fitness = pow(1/d, 2);
+    if (stopped) fitness *= 0.1;
   }
   ```
 
@@ -1124,24 +1124,24 @@
 
   ```java
   void checkTarget() {
-      float d = dist(location.x, location.y, target.location.x, target.location.y);
-      if (d < recordDist) recordDist = d;
-      
-      if (target.contains(location)) {
-        hitTarget = true;
-      } else if (!hitTarget) {
-        finishTime++;
-      }
+    float d = dist(location.x, location.y, target.location.x, target.location.y);
+    if (d < recordDist) recordDist = d;
+  
+    if (target.contains(location)) {
+      hitTarget = true;
+    } else if (!hitTarget) {
+      finishTime++;
+    }
   }
   ```
 
   ```java
   void fitness() {
-      fitness = (1/(finishTime*recordDist));
-      fitness = pow(fitness, 2);
-   
-      if (stopped) fitness *= 0.1;
-      if (hitTarget) fitness *= 2;	//You are rewarded for reaching the target.
+    fitness = (1/(finishTime*recordDist));
+    fitness = pow(fitness, 2);
+  
+    if (stopped) fitness *= 0.1;
+    if (hitTarget) fitness *= 2;	//You are rewarded for reaching the target.
   }
   ```
 
@@ -1158,9 +1158,9 @@
 
 * 之前的实验与现实相比都有点奇怪，比如下一代同时出生，上一代同时消失，也没有人用计算器去统计健康度。我们有必要研究一下如何用遗传算法构建类似于生态系统的东西，就像每章结尾那样。
 
-* 我们从一个简单场景开始。一种叫“bloop”的圆形生物，根据佩林噪音在屏幕上移动。它有半径和最大速度，而且半径越大，速度越慢。我们使用ArrayList而不是数组存储族群，意味着成员数量是可变的。ArrayList将存储在World类中，管理族群的所有成员。
+* 我们从一个简单场景开始。一种叫“小胖（bloop）”的圆形生物，根据佩林噪音在屏幕上移动。它有半径和最大速度，而且半径越大，速度越慢。我们使用ArrayList而不是数组存储族群，意味着成员数量是可变的。ArrayList将存储在World类中，管理族群的所有成员。
 
-* 我们要添加两个额外的功能：出生和死亡。死亡是替代健康度评估和选择的功能，如果成员死亡，他就无法被选择，因为它已经不存在了。一种实现死亡的机制是在类中添加健康变量。每一帧运动，健康度降低一些，降至0即死亡。我们必须设法让成员拥有不同的寿命，以防止他们同时死去，比如速度更快的“bloop”更容易逃脱，所以活得更久，或者引入食物机制，进食可以延长寿命。
+* 我们要添加两个额外的功能：出生和死亡。死亡是替代健康度评估和选择的功能，如果成员死亡，他就无法被选择，因为它已经不存在了。一种实现死亡的机制是在类中添加健康变量。每一帧运动，健康度降低一些，降至0即死亡。我们必须设法让成员拥有不同的寿命，以防止他们同时死去，比如速度更快的小胖更容易逃脱，所以活得更久，或者引入食物机制，进食可以延长寿命。
 
   ```java
   void eat() {
@@ -1175,9 +1175,335 @@
   }
   ```
 
-* 接下来建立基因型和表型。
+* 接下来建立基因型和表型。小胖找到食物的能力和两个变量有关-大小和速度。但因为大小和速度反相关，所以只需要存储一个值。
+
+  ```java
+  class DNA {
+    float[] genes;
+    DNA() {
+      genes = new float[1];
+      //只有一个值，但沿用数组。这样方便扩展
+      for (int i = 0; i < genes.length; i++) {
+        genes[i] = random(0,1);
+      }
+    }
+  ...
+  ```
+
+  表型是小胖类本身，大小和速度由内部的基因类决定。
+
+  ```java
+  class Bloop {
+    PVector location;
+    float health;
+   
+    DNA dna;
+    float r;
+    float maxspeed;
+   
+    Bloop(DNA dna_) {
+      location = new PVector(width/2,height/2);
+      health = 200;
+      dna = dna_;
+       maxspeed = map(dna.genes[0], 0, 1, 15, 0);
+      r        = map(dna.genes[0], 0, 1, 0, 50);
+    }
+  ...
+  ```
+
+  根据上面的代码，基因值为0以15的速度移动，基因为1则不动。
+
+* 选择和繁殖。小胖的生命越长，繁殖机会就越多，寿命即健康值。一种选择是，当两个小胖相遇时，就会产生一个小小胖，因为寻找对象也是繁殖的因素之一。一个更简单的算法是“无性繁殖”，其描述为：在任意给定时刻，小胖有1%的机会繁殖后代。
+
+  ```java
+  Bloop reproduce() {
+    if (random(1) < 0.01) {
+      // Make the Bloop baby
+    }
+  }
+  ```
+
+  在前面的实验，繁殖过程我们调用了`crossover()`，在单性繁殖中，我们调用`copy()`：
+
+  ```java
+  Bloop reproduce() {
+    if (random(1) < 0.0005) {
+      DNA childDNA = dna.copy();
+      childDNA.mutate(0.01);
+      return new Bloop(location, childDNA);
+    } else {
+      return null;
+    }
+  }
+  ```
+
+  注意，上面显示繁殖几率更低了，这个值的影响在于，繁殖几率高会产生人口过剩，过低则导致族群灭绝。自我复制的函数实现如下，利用了`arraycopy`函数：
+
+  ```java
+  class DNA {
+  	//This copy() function replaces crossover() in this example.
+    DNA copy() {
+       float[] newgenes = new float[genes.length];
+      arraycopy(genes,newgenes);
+      return new DNA(newgenes);
+    }
+    ...
+  }
+  ```
+
+  程序运行的结果是中型体积和中型移动速度的小胖最终活下来。
+
+* 每章课后练习：生态系统。
 
 
+
+#### 10 神经网络
+
+10.0
+
+* 人类的大脑可以描述为生物神经网络-传输复杂模式的电信号的神经元互联网络。在本章中，我们将首先概述神经网络的属性和特征，并构建一个最简单的例子。 之后，我们将研究创建Brain对象的策略，该对象可以插入到我们的Vehicle类中并用于确定转向。 最后，我们还将研究用于可视化和动画的神经网络技术。
+
+10.1
+
+* 1943年，神经科学家Warren S. McCulloch和逻辑学家Walter Pitts开发了人工神经网络的第一个概念模型。 在他们的论文“A logical calculus of the ideas imminent in nervous activity”中，他们描述了神经元的概念，一个生活在细胞网络中的单个细胞，接收输入、处理这些输入并产生输出。
+* 有些事情对人类来说很难，比如求964324的平方根，但机器不到一毫秒就能得出982。有些事对人类来说很简单，对带脑来说确很困难，比如分辨猫和狗，识别特定的人（在神经网络发明以前）。当今计算中神经网络最常见的应用之一就是执行这些“人工容易，机器困难”的任务，通常称为模式识别。 应用范围从光学字符识别（将打印或手写扫描转换为数字文本）到面部识别。 推荐两本书：《*Artificial Intelligence: A Modern Approach* 》by Stuart J. Russell and Peter Norvig 以及《*AI for Game Developers* 》by David M. Bourg and Glenn Seemann.
+* 神经网络是连接机制（connectionist）的计算系统。我们通常的系统是线性的，执行完一条指令，继续下一条。神经网络是并行的。单个神经元很简单，但是很多神经元的网络表现出丰富和智能的行为。
+* 神经网络的关键要素之一是它的学习能力。 神经网络不仅仅是一个复杂的系统，而是一个复杂的自适应系统，这意味着它可以根据流经它的信息改变其内部结构。 通常，这是通过调整权重来实现的。
+* 学习策略有几种，我们研究其中两种：
+  * 监督学习（Supervised Learning）。我们的第一个例子使用这种策略。
+  * 无监督学习（Unsupervised Learning）。我们的实验不涉及。
+  * 强化学习（Reinforcement Learning）。在机器人技术中很常见。我们的小车转向实验中使用这种策略。
+* 神经网络的学习能力，使其在人工智能领域很有用。以下是软件中的一些标准用法，并非全部：
+  * 模式识别。比如人脸识别（facial recognition）。
+  * 预测时间序列。比如天气、股票。
+  * 信号处理。比如助听器需要滤除不必要的噪声并放大重要声音。
+  * 控制。比如自动驾驶。
+  * 软传感器（Soft Sensors）。接收多个单独传感器的数据作为整体评估。
+  * 异常检测 - 因为神经网络非常善于识别模式，所以它们也可以被训练以在出现不适合模式的事物时生成输出。
+
+10.2
+
+* 感知机（Perceptron）是最简单的神经网络：单个神经元的计算模型。感知机遵循前馈（feed-forward）模型，让我们看看每一步：
+
+  * 第一步：输入值。
+
+    ```
+    Input 0: x1 = 12
+    Input 1: x2 = 4
+    ```
+
+  * 第二步：输入权重（weight）。输入值传送给感知器之前要先加权重，创建建感知器时分配随机权重。
+
+    ```
+    Weight 0: 0.5
+    Weight 1: -1
+    ```
+
+  * 第三步：求和。
+
+    ```
+    Sum = 12 * 0.5 + 4 * -1 = 2
+    ```
+
+  * 第四步：生成输出。求和结果经过激活函数（activation function）处理生成输出结果，最简单的情况下，激活函数告诉感知器是否触发（是否输出结果）。事实上激活函数可以是很复杂的，但是在我们的例子中，我们只将激活函数作为输出结果的符号。
+
+10.3
+
+* 一个最简单的模式识别的例子，通过训练感知器判断二维空间的一点在直线的哪一侧。感知器有两个输入值（x，y坐标值），激活函数判断计算结果符号输出-1或1。
+* 考虑点（0,0），不管怎么调整输入权重，加和总为0。所以增加一个输入值：偏移量（bias）。偏移量通常为1并且也有权重值。计算结果是三个值权重之后的和，根据结果符号判断位置关系，所以偏移量本身，即反映了点（0,0）和直线的相对关系。
+
+10.4
+
+* 编码实现感知器Perceptron类，该类只需要跟踪权重数据。
+
+  ```java
+  class Perceptron {
+    float[] weights;
+    
+    Perceptron(int n) {
+      weights = new float[n];
+      for (int i = 0; i < weights.length; i++) {
+        weights[i] = random(-1,1);	//The weights are picked randomly to start.
+      }
+    }
+  ...
+  ```
+
+  感知器需要接受输入生成输出，我们定义函数`feedforward`：
+
+  ```java
+  int feedforward(float[] inputs) {
+    float sum = 0;
+    for (int i = 0; i < weights.length; i++) {
+      sum += inputs[i]*weights[i];
+    }
+    return activate(sum);
+  }
+  ```
+
+  现在创建一个感知机，让它猜猜点在线的上方还是下方：
+
+  ```java
+  Perceptron p = new Perceptron(3);
+  float[] point = {50,-12,1};
+  int result = p.feedforward(point);
+  ```
+
+  它猜对了吗？这时候，他猜对的概率不会超过一半，记得吗，我们初始化的权重值是随机生成的。除非我们告诉它怎么做，否则他很难把事情做准确。
+
+* 在我们的方法中，还要为输入值提供已知的结果。网络借此知道是否做出正确的判断，如果错误，就要调整权重。过程如下：
+
+  * 1 向感知机提供已知结果的输入值。
+  * 2 让感知机猜答案。
+  * 3 计算误差。
+  * 4 根据误差调整所有权重。
+  * 5 回到第1步并重复。
+
+  第3步和第4步如何实现？误差定义为：
+
+  `ERROR = DESIRED OUTPUT _ GUESS OUTPUT`
+
+  这类似于第六章计算转向力：
+
+  `STEERING = DESIRED VELOCITY - CURRENT VELOCITY`
+
+  因为输出值只有-1和1，意味着误差值只有三种取值：-1，0，1。误差是权重调整的决定因素，我们想计算得到的权重调整值称为“delta weight”，delta代表希腊字母 $ \Delta$。
+
+  `NEW WEGHT = WEIGHT + DELTA WEIGHT` 且 `DELTA WEIGHT = ERROR * INPUT`
+
+  所以`NEW WEGHT = WEIGHT + ERROR * INPUT`
+
+  为了说明以上工作机制，我们还是回到转向力的例子。转向力是速度的偏差，如果将转向力作为加速度，小车就会向正确的方向移动。这也是我们想要对神经网络中权重做的，我们想要把它调整到正确的方向。
+
+  在转向力实验中，转向力越大，速度调整的越快，转向力小，就调整得慢。神经网络中也有类似的机制，称为“学习常数（learning constant）”。将其添加进公式：
+
+  `NEW WEGHT = WEIGHT + ERROR * INPUT * LEARNING CONSTANT`
+
+  学习常数越大，权重调整的就越快，但可能跃过最合适的值；学习常数小，需要训练越长的时间，但结果会更精确。将变量c作为学习常数，训练函数如下：
+
+  ```java
+  float c = 0.01;
+   
+  void train(float[] inputs, int desired) {
+    int guess = feedforward(inputs);
+    float error = desired - guess;
+    for (int i = 0; i < weights.length; i++) {
+      weights[i] += c * error * inputs[i];
+    }
+  }
+  ```
+
+* 为了训练感知机，我们需要已知结果的输入值的集合。我们将一组输入值和结果封装为Trainer类：
+
+  ```java
+  class Trainer {
+    float[] inputs;
+    int answer;
+   
+    Trainer(float x, float y, int a) {
+      inputs = new float[3];
+      inputs[0] = x;
+      inputs[1] = y;
+      inputs[2] = 1;	//the bias input
+      answer = a;
+    }
+  }
+  ```
+
+  接下来的问题是，如何计算点在线的上方还是下方？
+
+  ```java
+  float yline = f(x);
+  if (y < yline) {
+    answer = -1;	//在线的上方（这里别搞错了，Processing的y轴正方向向下）
+  } else {
+    answer = 1;
+  }
+  ```
+
+  训练感知机：
+
+  ```java
+  Trainer t = new Trainer(x, y, answer);
+  ptron.train(t.inputs,t.answer);
+  ```
+
+10.5
+
+* 将感知机的概念应用于转向行为，并说明强化学习。**注**:该例子中有很多不合理的地方，没法一一指出，只理解思想即可。
+
+* 假设有一个小车和一个目标列表，小车搜寻屏幕上的所有目标。还可以根据规则设置转向力权重，比如离目标越远，力就越大。
+
+  ```java
+  void seek(ArrayList<PVector> targets) {
+    for (PVector target : targets) {
+      //For every target, apply a steering force towards the target.
+      PVector force = seek(targets.get(i));
+      float d = PVector.dist(target,location);
+      float weight = map(d,0,width,0,5);
+      force.mult(weight);
+      applyForce(force);
+    }
+  }
+  ```
+
+  但是如果我们交个一个大脑去处理这件事呢？接收所有的力，输出处理后的力：
+
+  ```java
+  class Vehicle {
+    Perceptron brain;
+    
+    void seek(ArrayList<PVector> targets) {
+      PVector[] forces = new PVector[targets.size()];
+      for (int i = 0; i < forces.length; i++) {
+        forces[i] = seek(targets.get(i));
+      }
+      PVector output = brain.process(forces);
+      applyForce(output);
+    }
+  ```
+
+  这开辟了一种可能性，车辆可以决定如何驾驶，从错误中学习并对环境的刺激做出反应。感知机的处理函数如下：
+
+  ```java
+  PVector feedforward(PVector[] forces) {
+    PVector sum = new PVector();
+    for (int i = 0; i < weights.length; i++) {
+      // Vector addition and multiplication
+      forces[i].mult(weights[i]);
+      sum.add(forces[i]);
+    }
+    // No activation function
+    return sum;
+  }
+  ```
+
+  一旦施加了转向力，就应该向大脑提供反馈，称之为强化学习。大脑根据反馈判断向特定方向的引导是好的还是坏的。比如小车只想呆在屏幕中心，那么：
+
+  ```java
+  PVector desired = new PVector(width/2,height/2);
+  PVector error = PVector.sub(desired, location);
+  brain.train(forces,error);	//将输入力的副本和观察结果传给大脑
+  ```
+
+  大脑将误差作为调整权重的依据：
+
+  ```java
+  void train(PVector[] forces, PVector error) {
+    for (int i = 0; i < weights.length; i++) {
+      weights[i] += c*error.x*forces[i].x;
+      weights[i] += c*error.y*forces[i].y;
+    }
+  }
+  ```
+
+  每个权重都调整了两次，一次是x轴误差，一次是y轴误差。
+
+10.6
+
+* 如果你阅读人工智能的书籍，它会说感知机只能处理线性可分问题，比如点线位置关系的例子。图10.11中，左侧图的两种颜色的点可以用直线分开，他是线性可分的；右侧点则不能。
+* 最简单的非线性可分的例子是“XOR”，或称为“异或（Exclusive or）”。看图10.13的真值表。XOR相当于OR且NOT AND：$p\oplus q = (p\lor q)\land \lnot (p\land q)$，即“一真一假才为真”。
+* 感知机甚至不能解决异或问题，但是如果用两个感知机组成网呢，一个感知机处理OR，另一个感知机处理NOT AND。图10.14被称为多层（multi-layered）感知机。
 
 
 
