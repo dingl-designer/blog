@@ -12,3 +12,5 @@
 
 #### [The Nature of Code 读书笔记0-5](./NOCReadingNotes0-5.html)
 
+#### [The Nature of Code 读书笔记6-10](./NOCReadingNotes6-10.html)
+

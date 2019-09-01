@@ -66,6 +66,48 @@
 
   打开dubbo的jar包，在`\META-INF`目录下有一个spring.handlers文件，内容为`http\://code.alibabatech.com/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler`，看来两者需要保持一致才行。
 
+
+
+#### 启动dubbo-admin
+
+* 对于dubbo的管理其实是通过注册中心管理，所以项目的数据来源是注册中心。
+
+* 官方给的启动步骤
+
+  ```
+  git clone https://github.com/apache/dubbo-admin.git
+  cd dubbo-admin
+  mvn clean package
+  cd dubbo-admin-distribution/target
+  java -jar dubbo-admin-0.1.jar
+  ```
+
+* 实际操作
+
+  第一步拷贝下来的是开发版，我试着打包两次，实在太慢，所以我下载了以前的版本。
+
+  ```
+  git clone --branch 0.1 https://github.com/apache/dubbo-admin.git
+  ```
+
+  打包之前检查下面的配置文件里的zookeeper地址是否正确。
+
+  ```
+  dubbo-admin-server/src/main/resources/application.properties
+  ```
+
+  ```
+  admin.config-center=zookeeper://127.0.0.1:2181
+  admin.registry.address=zookeeper://127.0.0.1:2181
+  admin.metadata-report.address=zookeeper://127.0.0.1:2181
+  ```
+
+  打包过程中报了一些错误信息，提示zookeeper中某些节点不存在，但不影响最终打包成功。启动dubbo-admin之前确认zookeeper处于启动状态。
+
+  dubbo-admin默认访问地址http://localhost:8080。
+
+
+
 #### 其他
 
 * web项目（`<packaging>war</packaging>`）如果想打成jar包，可以在打包插件中使用attachClasses属性。
