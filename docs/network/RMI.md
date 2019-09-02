@@ -253,13 +253,13 @@ public interface Agent extends java.io.Serializable {
 
 相对而言，RMI传递的是完整的类型（包括实现），所以你可以在你的分布式计算系统的任何地方使用面向对象编程（包括设计模式）。如果没有RMI的完整面向对象系统，你只能在分布式计算系统中放弃设计模式。
 
-*注*：虽然 server 只有服务器这一种中文解释，但是从下面开始， 将 server 译为服务提供者或者简称为服务似乎更合适
+*注*：虽然 server 只有服务器这一种中文解释，但是有些时候， 将 server 译为服务提供者或者简称为服务似乎更合适
 
 #### 连接现有服务（Server）
 
 RMI借助JNI和JDBC可以连接两层或三层架构系统，即使两边都不是使用Java编写的。
 
-假设你有一个现有系统用来在关系数据库中存储消费者订单信息。在任何多层架构系统中你需要设计一个远程接口使得客户端可以访问服务器，就像RMI的Remote接口：
+假设你有一个现有系统用来在关系数据库中存储消费者订单信息。在任何多层架构系统中你需要设计一个远程接口使得客户端可以访问服务器，使用RMI的话将会是一个Remote接口：
 
 ```java
 import java.rmi.*;
@@ -277,6 +277,95 @@ public interface OrderServer extends Remote {
 接下来我们将向你展示如何使用JDBC实现getUnpaid和使用JNI实现shutDown。
 
 #### JDBC-直连数据库
+
+​	使用JDBC实现getUnpaid：
+
+```java
+import java.rmi.*;
+import java.rmi.server.*;
+import java.sql.*;
+import java.util.Vector;
+public class OrderServerImpl
+    extends UnicastRemoteObject
+    implements OrderServer
+{
+    Connection db;                  // connection to the db
+    PreparedStatement unpaidQuery;  // unpaid order query
+    OrderServerImpl() throws RemoteException, SQLException {
+        db = DriverManager.getConnection("jdbc:odbc:orders");
+        unpaidQuery = db.prepareStatement("...");
+    }
+    public Vector getUnpaid() throws SQLException {
+        ResultSet results = unpaidQuery.executeQuery();
+        Vector list = new Vector();
+        while (results.next())
+            list.addElement(new Order(results));
+        return list;
+    }
+    public native void shutDown();
+}
+```
+
+大部分是JDBC的工作。当RMI服务器对象OrderServerImpl的getUnpaid方法被调用的时候，预编译的查询被执行。
+
+#### JNI-本地方法
+
+​	RMI服务器和客户端可以利用本地方法作为连接现有系统的桥梁。你可以用本地方法实现没有直连数据库或使用现有代码更易实现的远程方法（RMI调用）。本地接口JNI使你能够写C或C++代码来实现Java方法，并且通过Java对象调用。下面是本地方法实现shutDown：
+
+```c
+JNIEXPORT void JNICALL
+Java_OrderServerImpl_shutDown(JNIEnv *env, jobject this)
+{
+    jclass cls;
+    jfieldID fid;
+    DataSet *ds;
+    cls = (*env)->GetObjectClass(env, this);
+    fid = (*env)->GetFieldID(env, cls, "dataSet", "J");
+    ds = (DataSet *) (*env)->GetObjectField(env, this, fid);
+    /* With a DataSet pointer we can use the original API */
+    DSshutDown(ds);
+}
+```
+
+这是假设了现有服务器可通过其API定义的DataSet类型被引用。一个DataSet指针被存储在dataSet属性中。当客户端调用shutDown的时候，会导致服务器的shutDown方法被调用。因为服务器实现声明了shutDown使用本地方法来实现，RMI会直接调用本地方法。本地方法找到对象的dataSet属性，使用它调用现有的API函数DSshutDown。
+
+*稍后总结一下JNI语法*
+
+Sun目前正在与ILOG合作开发一款名为TwinPeaks的产品。TwinPeaks将采用现有的C和C++ API生成Java类包装对该API的调用，这允许你使用Java调用任何现有的API。所以，当TwinPeaks可用以后，你完全可以使用Java编写shutDown方法（相当于上面的JNI代码），而无需JNI。
+
+
+
+#### 结构
+
+​	RMI系统致力于为面向对象的分布式计算提供简单直接的基础。它的结构设计为将来可扩展服务和引用类型，因此RMI能够以一致的方式添加特性。
+
+当服务被导出时，它的引用类型被定义好了。在上面的例子中，我们将服务导出为UnicastRemoteObject服务，他们是点对点的未复制（unreplicated）服务。对这些对象的引用适合此类型的服务。不同的服务类型会有不同的引用含义（semantics）。例如，MulticastRemoteObject的引用含义是允许复制服务（replicated service）。
+
+当客户端收到服务器的引用，RMI下载一个存根（stub），该存根将对引用的调用翻译成对服务器的远程调用。如图3所示，存根（第一条竖线）使用对象序列化组织方法的参数，并向服务器发送组织好的调用。在服务器端，RMI系统接收到调用请求，并连接到框架（第二条竖线），框架负责反序列化参数并调用服务器方法的实现。当服务器的实现执行完毕，返回值或抛出异常，框架组织结果并回复客户端存根。存根将应答反序列化，返回结果或抛出异常。存根和框架由服务器实现生成，通常是使用`rmic`程序。存根使用引用和框架交互。这样的框架允许引用来定义交流的行为。UnicastRemoteObject服务使用的引用和单独的服务对象进行交流，这个对象在特定主机和端口上运行。用来处理复制服务的引用将会组播服务请求到一组复制服务上，然后收集响应，根据多个响应返回合适的结果。另外一种引用类型可以在服务未运行在虚拟机的情况下将其唤醒。这些引用类型对客户端是透明的（不可见的）。
+
+#### 安全性
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
