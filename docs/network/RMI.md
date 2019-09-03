@@ -1,6 +1,10 @@
-RMI是dubbo框架实现的基础，官方教程：
+RMI教程：
 
 [Java Remote Method Invocation - Distributed Computing for Java](https://www.oracle.com/technetwork/java/javase/tech/index-jsp-138781.html)
+
+如果想运行代码，还需要参考：
+
+https://docs.oracle.com/javase/tutorial/rmi/TOC.html
 
 
 
@@ -153,7 +157,7 @@ public class TomorrowsPolicy implements Policy {
 
 RMI使用标准的Java对象序列化机制传递对象。与远程对象有引用关系（references）的参数（如果翻译成“引用远程对象的参数”会有歧义）作为远程引用被传递。如果方法的参数是基本类型或本地（非远程）对象，会向服务器发送一个深拷贝副本。返回值在相反的方向上做同样的处理。RMI允许传递和返回本地对象的完整对象图（full object graphs）和远程对象的引用。
 
-*暂留一个疑问*：RMI客户端其实并不需要知道当前的实现类是如何的，只需要调用接口。而在dubbo（或spring）中，如果没有实现类，接口是不能被注入和调用的。
+*Policy接口在客户端和服务端都会用到，实际工作中，该接口会存在于jar包中，然后将jar包分发给客户端和服务端进行引用*
 
 #### 计算服务器
 
@@ -175,8 +179,6 @@ public interface ComputeServer extends Remote{
 	Object compute(Task task) throws RemoteException;
 }
 ```
-
-*暂留一个问题*：上面的Task接口并没有import，这说明Task在同一个包下。可是上面Task接口是客户端代码，那么服务端又重新写了一遍吗？
 
 这个远程接口的唯一目的，就是允许客户端创建任务并传递给服务器进行计算，返回计算结果。下面是接口的一个基本实现：
 
@@ -253,7 +255,7 @@ public interface Agent extends java.io.Serializable {
 
 相对而言，RMI传递的是完整的类型（包括实现），所以你可以在你的分布式计算系统的任何地方使用面向对象编程（包括设计模式）。如果没有RMI的完整面向对象系统，你只能在分布式计算系统中放弃设计模式。
 
-*注*：虽然 server 只有服务器这一种中文解释，但是有些时候， 将 server 译为服务提供者或者简称为服务似乎更合适
+*注*：虽然 server 只有“服务器”这一种中文解释，但是有些时候， 将 server 译为服务提供者或者简称为服务似乎更合适，但并不是指提供的服务本身，服务本身应该称为service。
 
 #### 连接现有服务（Server）
 
@@ -310,7 +312,7 @@ public class OrderServerImpl
 
 #### JNI-本地方法
 
-​	RMI服务器和客户端可以利用本地方法作为连接现有系统的桥梁。你可以用本地方法实现没有直连数据库或使用现有代码更易实现的远程方法（RMI调用）。本地接口JNI使你能够写C或C++代码来实现Java方法，并且通过Java对象调用。下面是本地方法实现shutDown：
+​	RMI服务器和客户端可以利用本地方法作为连接现有系统的桥梁。你可以用本地方法实现没有直连数据库或使用现有代码更易实现的远程方法（RMI调用）。本地接口JNI使你能够写C或C++代码来实现Java方法，并且通过Java对象调用。下面是本地方法实现shutDown（应该是用C写的，C++一般会加`extern "C"`）：
 
 ```c
 JNIEXPORT void JNICALL
@@ -328,8 +330,6 @@ Java_OrderServerImpl_shutDown(JNIEnv *env, jobject this)
 ```
 
 这是假设了现有服务器可通过其API定义的DataSet类型被引用。一个DataSet指针被存储在dataSet属性中。当客户端调用shutDown的时候，会导致服务器的shutDown方法被调用。因为服务器实现声明了shutDown使用本地方法来实现，RMI会直接调用本地方法。本地方法找到对象的dataSet属性，使用它调用现有的API函数DSshutDown。
-
-*稍后总结一下JNI语法*
 
 Sun目前正在与ILOG合作开发一款名为TwinPeaks的产品。TwinPeaks将采用现有的C和C++ API生成Java类包装对该API的调用，这允许你使用Java调用任何现有的API。所以，当TwinPeaks可用以后，你完全可以使用Java编写shutDown方法（相当于上面的JNI代码），而无需JNI。
 
@@ -396,4 +396,11 @@ Sun目前正在与ILOG合作开发一款名为TwinPeaks的产品。TwinPeaks将�
 以上。
 
 
+
+#### 实践
+
+​	按照第二份教程的步骤搭建demo，过程中遇到两个问题：
+
+* 在添加安全策略文件的时候，xxx.policy的中的类文件路径，即使是在Windows下依旧用“/”，比如`"file:e:/codes/rmi/src"`。
+* 在启动服务的时候，`-Djava.rmi.server.hostname=mycomputer.example.com`中的域名需要在本机host文件中配置，否则客户端调用时无法解析。或者因为服务和客户端都在本机上，`-Djava.rmi.server.hostname=127.0.0.1`；客户端调用时`client.ComputePi 127.0.0.1 45`。
 
