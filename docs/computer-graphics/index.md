@@ -1,4 +1,6 @@
-#### [Ubuntu18.04 下 OpenGL环境配置 ](./opengl-evn.html)
+#### [Ubuntu18.04 下 OpenGL环境配置 ](./OPENGL-evn.html)
+
+#### [图像文件存储格式](./PIC-format.html)
 
 #### [光滑粒子流体动力学：理论与非球形星体实践（译）](./SPH1977.html)
 
