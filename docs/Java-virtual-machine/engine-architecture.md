@@ -1,0 +1,106 @@
+[JVM技术](https://www.oracle.com/technetwork/java/javase/tech/index-jsp-136373.html)之[引擎结构](https://www.oracle.com/technetwork/java/whitepaper-135217.html)
+
+
+
+<a href="#a_overview">Chapter 1. Introduction and Overview</a>
+
+<a href="#a_arch">Chapter 2. The Java HotSpot VM Architecture</a>
+
+
+
+
+
+### 第一章 概述
+
+Java HotSpot VM（virtual machine）是由太阳微系统公司的高性能Java平台VM。Java HotSpot技术是Java SE平台的基础，是快速开发和部署业务关键型桌面和企业应用程序的首选解决方案。Java SE技术支持Solaris（太阳微系统公司研发的操作系统）、Linux和Windows等系统。
+
+Java平台已成为软件开发和部署的主流工具。随着开发人员和用户的增多，Java平台在很多方面爆炸式增长：从信用卡到无线设备，从桌面系统到大型机。它是部署Web页面小程序、Web services、大型商业软件的基础。
+
+Java HotSpot VM基于Java技术的跨平台支持和健壮的安全模型，并在扩展性、质量和性能方面增加新的功能和特性。
+
+Java HotSpot VM几乎支持企业应用的开发、部署和管理所有方面。它被应用于：
+
+* 集成开发环境（Integrated development environments），包括Sun Java Studio Tools、NetBeans、IBM的Eclipse、IntelliJ IDEA、Oracle JDeveloper等。
+* 应用服务供应商包括Sun Sun Java System Application Server, BEA Systems' WebLogic software, IBM's WebSphere software, Apple Computer, Inc.'s WebObjects software等。
+
+太阳微系统公司还通过使用各种业界标准和内部开发的基准来推动性能提升。 这些改进适用于客户端和服务器端Java VM环境。
+
+Java SE平台包含两种虚拟机实现：
+
+* Java  HotSpot客户端虚拟机，在客户端环境中运行应用程序时通过减少应用程序启动时间和内存占用来获得最佳性能。
+* Java HotSpot 服务器虚拟机，旨在最大程度地提高服务器环境中运行的应用程序的执行速度。
+
+#### Java HotSpot VM建立在坚实的基础之上
+
+Java HotSpot VM建立在强大的功能和特性基础之上。 体系结构支持动态、面向对象的优化，拥有世界一流的性能。 即使是在当今最大的计算系统上VM的多线程支持也能实现高可扩展性。 优越的可靠性\可用性和可维护性（RAS-Reliability,Availability and Serviceability）可提供企业级可靠性，同时实现快速开发，自省和管理。
+
+### 第二章 Java HotSpot VM 体系结构
+
+#### 概述
+
+Java HotSpot VM使用许多先进技术为Java应用程序提供最佳性能，包括最先进的（state-of-the-art）内存模型、垃圾回收、自适应优化器。它以高级的面向对象风格编写，并具有一下特点：
+
+* 统一的对象模型
+* 解释、编译和本地帧（native frame）都适用相同的栈（stack）
+* 基于本地线程的抢占式（preemptive）多线程
+* 垃圾回收
+* 极其快速的线程同步
+* 动态去除最优化（de-optimization）和积极的编译器优化
+* VM启动时生成的特定系统的运行时例程
+* 支持并行编译的编译器接口
+* 运行时的概要将编译工作聚焦到“hot”方法（Run-time profiling focuses compilation effort only on "hot" methods）
+
+JDK包括两种特色的VM——客户端产品和针对服务器应用进行调整的VM。这两种解决方案共享Java HotSpot运行环境代码库，但是用不同的编译器，两种编译器分别适用于客户端和服务器的独特性能特征。这些差异包括编译内敛策略和堆（heap）默认值。
+
+JDK在发行版中包含这两个系统，因此开发人员可以通过指定-client或-server来选择他们想要的。
+
+虽然服务器和客户端VMs类似，但是服务器VM专门调整以获得最大的峰值运行速度。它用于执行长时间运行的服务器应用，这些应用程序需要尽可能快的运行速度，而不是更快的启动速度和更小的内存占用。
+
+客户端VM编译器是经典VM和老版本的JDK使用的实时（JIT）编译器的升级版。客户端VM为应用程序和小应用程序提供了更好的运行时性能。Java HotSpot客户端VM进行了专门的调整以减少应用程序的启动时间和内存占用，使其更适合客户端环境。一般来说，客户端系统更适合图形用户界面（GUI）。
+
+客户端VM编译器不会去尝试执行许多更复杂的优化（这些优化在服务器VM编译器中将会执行），作为交换，它只需更少的时间来分析和编译一段代码。这意味着客户端VM可以更快地启动并且需要更小的内存占用。
+
+服务器VM包含一个先进的自适应编译器，它支持许多优化C++编译器时使用的优化类型，以及一些传统编译器无法完成的优化，比如跨虚拟方法调用的积极内联。这是相对于静态编译器的竞争和性能优势。自适应编译技术在方法方面非常灵活，甚至超越了高级静态分析和编译技术。
+
+两种解决方案均承诺极度的可靠性、安全性和可维护的环境，以满足当今企业客户的要求。
+
+#### 内存模型
+
+##### 无句柄对象
+
+在之前版本的Java VM（比如经典 VM）中，间接句柄用于表示对象引用。虽然这使得在垃圾收集期间重新定位对象变得容易，它意味着一个重要的性能瓶颈，因为访问Java编译编程语言对象的实例变量需要两层的间接引用。
+
+在Java HotSpot VM中，Java代码不使用句柄。对象引用由直接指针来实现。这实现了对实例变量的C-speed（像C一样快？）访问。当对象在内存回收期间被重定位时，垃圾回收器负责查找和更新对象的所有引用。
+
+##### 双字对象头
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
