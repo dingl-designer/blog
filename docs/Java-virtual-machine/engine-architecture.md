@@ -2,15 +2,23 @@
 
 
 
-<a href="#a_overview">Chapter 1. Introduction and Overview</a>
+<a href="#1">Chapter 1. Introduction and Overview</a>
 
-<a href="#a_arch">Chapter 2. The Java HotSpot VM Architecture</a>
+* <a href="#solid">Java HotSpot VM -- Built on a Solid Foundation</a>
+
+<a href="#2">Chapter 2. The Java HotSpot VM Architecture</a>
+
+* [Overview](https://www.oracle.com/technetwork/java/whitepaper-135217.html#overview)
+* [Memory Model](https://www.oracle.com/technetwork/java/whitepaper-135217.html#memory)
+* [Garbage Collection](https://www.oracle.com/technetwork/java/whitepaper-135217.html#garbage)
+* [Ultra-Fast Thread Synchronization](https://www.oracle.com/technetwork/java/whitepaper-135217.html#ultra)
+* [64-bit Architecture](https://www.oracle.com/technetwork/java/whitepaper-135217.html#64)
 
 
 
 
 
-### 第一章 概述
+### <a id="1"> </a>第一章 概述
 
 Java HotSpot VM（virtual machine）是由太阳微系统公司的高性能Java平台VM。Java HotSpot技术是Java SE平台的基础，是快速开发和部署业务关键型桌面和企业应用程序的首选解决方案。Java SE技术支持Solaris（太阳微系统公司研发的操作系统）、Linux和Windows等系统。
 
@@ -30,11 +38,11 @@ Java SE平台包含两种虚拟机实现：
 * Java  HotSpot客户端虚拟机，在客户端环境中运行应用程序时通过减少应用程序启动时间和内存占用来获得最佳性能。
 * Java HotSpot 服务器虚拟机，旨在最大程度地提高服务器环境中运行的应用程序的执行速度。
 
-#### Java HotSpot VM建立在坚实的基础之上
+#### <a id="solid"> </a>Java HotSpot VM建立在坚实的基础之上
 
 Java HotSpot VM建立在强大的功能和特性基础之上。 体系结构支持动态、面向对象的优化，拥有世界一流的性能。 即使是在当今最大的计算系统上VM的多线程支持也能实现高可扩展性。 优越的可靠性\可用性和可维护性（RAS-Reliability,Availability and Serviceability）可提供企业级可靠性，同时实现快速开发，自省和管理。
 
-### 第二章 Java HotSpot VM 体系结构
+### <a id="2"> </a>第二章 Java HotSpot VM 体系结构
 
 #### 概述
 
@@ -74,11 +82,19 @@ JDK在发行版中包含这两个系统，因此开发人员可以通过指定-c
 
 ##### 双字对象头
 
+Java HotSpot VM 使用两个机器字对象头，而不是经典VM中的三个字。由于Java 对象的平均大小很小，这对空间占用有很大的影响（对象占用空间越小，减少一个字节带来的收益比例就越大），对于典型的应用程序，可以节省大约8%的堆空间占用。对象头部第一个字包含诸如标识哈希码和GC状态之类的信息。第二个字节是对象的类的引用。只有数组有三个字节的头，为了存放数组的元素个数。
 
+##### 反射数据表示为对象
 
+类、方法和其他内部反射数据直接表示为堆上的对象（尽管这些对象可能无法直接访问基于Java技术的程序）。这不仅简化了VM内部的对象模型，并且允许类对象被其他 Java对象使用的垃圾收集器进行回收。
 
+##### 本地线程支持，包括抢占式和多线程
 
+每个线程方法激活栈都使用主机操作系统的的栈和线程模型来表示。Java语言方法和本地方法共享栈，允许C和Java之间快速调用。使用主机操作系统的线程调度机制来支持完全抢占式的（Fully preemptive）Java语言线程。
 
+使用本地操作系统线程和调度的一个主要优势是能够透明地利用本地操作系统的多线程支持。Java HotSpot VM被设计为在执行Java代码时对抢占和多线程引起的竞争条件不敏感，因此Java线程将自动利用本地操作系统提供的任何调度和处理器分配策略。
+
+#### 垃圾回收
 
 
 
