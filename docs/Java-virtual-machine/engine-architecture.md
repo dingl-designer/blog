@@ -8,11 +8,11 @@
 
 <a href="#2">Chapter 2. The Java HotSpot VM Architecture</a>
 
-* [Overview](https://www.oracle.com/technetwork/java/whitepaper-135217.html#overview)
-* [Memory Model](https://www.oracle.com/technetwork/java/whitepaper-135217.html#memory)
-* [Garbage Collection](https://www.oracle.com/technetwork/java/whitepaper-135217.html#garbage)
-* [Ultra-Fast Thread Synchronization](https://www.oracle.com/technetwork/java/whitepaper-135217.html#ultra)
-* [64-bit Architecture](https://www.oracle.com/technetwork/java/whitepaper-135217.html#64)
+* <a href="#overview">Overview</a>
+* <a href="#memory">Memory Model</a>
+* <a href="#garbage">Garbage Collection</a>
+* <a href="#ultra">Ultra-Fast Thread Synchronization</a>
+* <a href="#64">64-bit Architecture</a>
 
 
 
@@ -44,7 +44,7 @@ Java HotSpot VM建立在强大的功能和特性基础之上。 体系结构支�
 
 ### <a id="2"> </a>第二章 Java HotSpot VM 体系结构
 
-#### 概述
+#### <a id="overview"> </a>概述
 
 Java HotSpot VM使用许多先进技术为Java应用程序提供最佳性能，包括最先进的（state-of-the-art）内存模型、垃圾回收、自适应优化器。它以高级的面向对象风格编写，并具有一下特点：
 
@@ -72,7 +72,7 @@ JDK在发行版中包含这两个系统，因此开发人员可以通过指定-c
 
 两种解决方案均承诺极度的可靠性、安全性和可维护的环境，以满足当今企业客户的要求。
 
-#### 内存模型
+#### <a id="memory"> </a>内存模型
 
 ##### 无句柄对象
 
@@ -94,7 +94,7 @@ Java HotSpot VM 使用两个机器字对象头，而不是经典VM中的三个�
 
 使用本地操作系统线程和调度的一个主要优势是能够透明地利用本地操作系统的多线程支持。Java HotSpot VM被设计为在执行Java代码时对抢占和多线程引起的竞争条件不敏感，因此Java线程将自动利用本地操作系统提供的任何调度和处理器分配策略。
 
-#### 垃圾回收
+#### <a id="garbage"> </a>垃圾回收
 
 Java HotSpot VM内存系统的代属性带来的灵活性，能够使用特定的垃圾收集算法来适应各种应用的需求。Java HotSpot VM支持几种不同的垃圾收集算法，旨在满足不同的暂停时间和吞吐量要求。
 
@@ -157,15 +157,23 @@ Java HotSpot VM采用最先进的分代复制收集器，使其拥有两个主�
 
 ##### 几乎并发的标记-扫描（Mark-Sweep）收集器
 
+对于需要大量堆的应用来说，默认的老代标记-压缩收集器带来的收集暂停经常造成程序中断，因为应用线程暂停时长和堆的大小成比例。Java HotSpot VM 为老对象空间实现了一个优化过的并行收集器，该收集器利用空闲处理器周期（或空闲处理器）收集巨大的堆空间，只需要应用线程暂停非常短的时间。这是通过在应用线程执行的同时进行大量的跟踪和清理工作来完成的。在一些情况下，由于某些处理器周期专门用来进行并发的收集活动，程序的的最大吞吐量可能会有所下降；然而，垃圾收集暂停时间的平均值和最大值经常能够减少一到两个数量级，这导致当在巨大的堆空间应用默认的同步标记-压缩算法时，能够获得没有突发的稳定响应。
 
+##### 并行（Parallel）老代收集器
 
+当前版本的Java HotSpot VM 为老代引入了并行标记-压缩收集器，以提高巨大堆空间程序的可扩展性。相对于并行标记-清除收集器关注减少暂停次数，并行老代收集器致力于通过同时使用多线程收集老代以提高暂停期间的吞吐量。并行老代收集器内部使用很多的先进技术和数据结构，在确保收集周期内准确的垃圾收集和最小记账的优势的同时，实现高扩展性。
 
+#### <a id="ultra"> </a>超快（Ultra-Fast）的线程同步
 
+Java编程语言允许使用多个并行的程序执行路径-线程。Java语言提供了语言层面的线程同步，通过使用细粒度的锁，使得多线程程序的表达变得容易。以前的同步，比如经典VM中的实现，相对于其他Java语言中的微操作是非常低效的，这使得细粒度同步的使用成为了主要的性能瓶颈。
 
+Java HotSpot VM 整合了非竞争和竞争的同步操作的领先技术，使得同步性能得到和很大提高。非竞争同步操作（包括大部分的同步）使用极快的即时的技术来实现。使用最新的优化，在最好的情况下，即使是在多处理器计算机上这些操作几乎没有性能消耗。竞争性同步操作使用先进的自适应自旋技术提高吞吐量，即使是有大量的锁竞争的应用。结果就是，同步性能变得极快，对现实中的大部分程序来说，已不再是重要的性能问题了。
 
+#### <a id="64"> </a>64位架构
 
+早期发布的Java HotSpot VM 被限定只能寻址4GB内存，即使是在64位操作系统（比如Solaris OE）之上。对于桌面系统来说4GB已经足够，但是现代服务器包含多得多的内存。例如，Sun Fire E25K 服务器的每个节点支持1.15TB内存。使用64位的JVM，基于Java技术的程序可以使用这种系统的全部内存。
 
+对于某几类应用来说，使用64位寻址是非常有用的。比如，在内存中存放巨大数据集的那些。现在，应用程序可以避免在磁盘上存放或从RDBMS（Relational Database Management System）提取页数据。
 
-
-
+“一个人离职的原因有两个，要么钱给少了，要么受委屈了。”
 
