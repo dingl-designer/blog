@@ -1,4 +1,4 @@
-[使用Java动态下载代码：java.rmi.server.codebase](https://docs.oracle.com/javase/7/docs/technotes/guides/rmi/codebase.html)
+[Java动态下载代码：java.rmi.server.codebase](https://docs.oracle.com/javase/7/docs/technotes/guides/rmi/codebase.html)
 
 
 

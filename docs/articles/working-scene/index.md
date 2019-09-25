@@ -1,8 +1,12 @@
-#### [WebSocket](./WebSocket.html)
+#### [WebSocket实现长连接](./WebSocket.html)
 
-#### [Maven Repository](./MavenRepo.html)
+#### [Maven Repository配置和使用](./MavenRepo.html)
 
 #### [Dubbo+zookeeper](./DUBBO.html)
 
-#### [RMI](./RMI.html)
+#### [Dubbo基础之RMI](./RMI.html)
+
+#### [Java使用codebase动态下载代码](./codebase.html)
+
+#### [设计模式](./DesignPatterns.html)
 
