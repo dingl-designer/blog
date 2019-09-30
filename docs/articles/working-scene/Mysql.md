@@ -14,7 +14,7 @@ Ubuntu 18.04 LTS + MySQL 8
 
   MySQL Community Edition是社区版本，是免费的，也是我们日常使用的。
 
-#### 使用APT仓库安装
+#### 使用APT仓库安装MySQL
 
 根据[官方教程](https://dev.mysql.com/doc/mysql-apt-repo-quick-guide/en/)指引：
 
@@ -55,7 +55,7 @@ $sudo mysql -u root -p
 
 MySQL数据库自带的`mysql`库中的`user`表用于存放用户信息，其中`host`字段表示用户可以进行登录的主机，默认情况下，`root`用户只可以从`localhost`进行登录。
 
-1、使用root用户在本机登录后，创建一个可以任意主机进行登录的用户dinl，密码是`654321`
+1、使用root用户在本机登录后，创建一个可以任意主机（使用`%`符号）进行登录的用户dinl，密码是`654321`
 
 ```mysql
 mysql> create user 'dinl'@'%' identified by '654321';
@@ -68,9 +68,41 @@ mysql> grant select on *.* to 'dinl'@'%';
 mysql> flush privileges;
 ```
 
-3、删除用户
+3、此时通过远程可视化工具使用`dinl`连接数据库失败，提示`Public Key Retrieval is not allowed`。
+
+这是因为mysql 8 的升级了用户认证机制导致的。查看当前认证机制：
+
+```mysql
+mysql> select host,user,plugin from mysql.user;
+```
+
+可以看到`dinl`用户的默认认证机制为`caching_sha2_password`，改为旧版的`mysql_native_password`。
+
+```mysql
+mysql> alter user 'dinl'@'%' indentified with mysql_native_password by '654321';
+mysql> flush privileges;
+```
+
+再次尝试连接，成功。
+
+4、删除用户
 
 ```mysql
 mysql> drop user 'dinl'@'%';
 ```
 
+
+
+#### 教训
+
+教训一：使用APT安装MySQL时，未严格按照教程的`sudo apt-get update`，而是使用`sudo aptitude update`，总是更新失败，想当然地认为`sudo apt-get update`肯定也更新失败，进行了很多次失败的安装。
+
+教训二：在更改用户的的认证机制时，未严格按照
+
+```mysql
+mysql> alter user 'dinl'@'%' indentified with mysql_native_password by '654321';
+```
+
+而是想当然的省略了`by '654321'`部分，导致一直连接失败。
+
+上面的两个“想当然”浪费了大量时间。
