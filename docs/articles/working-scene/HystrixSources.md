@@ -7,7 +7,7 @@
 #### 补充知识点：
 
 - 泛型（generics）。
-- `rxjava-1.2.0.jar`，一个处理异步任务的包，其中的常用类`Observable`。
+- `rxjava-1.2.0.jar`，即[ReactiveX](http://reactivex.io/)技术，是观察者模式（observer pattern）的扩展。有人称之为函数式响应型编程（functional reactive programming），但这是一种误解，在其[简介](http://reactivex.io/intro.html)中就已经进行了澄清。理解RX的[Observable](http://reactivex.io/documentation/observable.html)对理解Hystrix是必不可少的。
 - `/*package*/`注释的作用是作者为了表明自己并非忘记写修饰符（`private/protected/public...`），而是确定使用默认的访问级别，即同一包内可访问（`default`）。
 - `java.util.concurrent.atomic`包，为了保持并发线程下对象操作的原子性。实现方式主要借助`volatile`修饰符，其用法参考[面试官最爱问的volatile关键字](https://juejin.im/post/5a2b53b7f265da432a7b821c)。
 
@@ -35,5 +35,15 @@
 #### interface HystrixCircuitBreaker
 
 * 熔断接口，本身包含两个实现类`HystrixCircuitBreakerImpl`和没有任何操作的`NoOpCircuitBreaker`。
-* 熔断逻辑据说融进了`HystrixCommand`。
+
+* 注释里说“熔断逻辑”融进了`HystrixCommand`。`HystrixCommand`构造器中的HystrixCircuitBreaker接口类型参数直接传递给了父类`AbstractCommand`，在父类的`handleFallback()`函数中调用了开启熔断的函数`circuitBreaker.markNonSuccess();`，而`handleFallback()`函数被绑定到了一个可观察对象的错误事件上：
+
+  ```java
+  execution.doOnNext(markEmits)
+    .doOnCompleted(markOnCompleted)
+    .onErrorResumeNext(handleFallback)
+    .doOnEach(setRequestContext);
+  ```
+
+  `execution`对象由`executeCommandWithSpecifiedIsolation(final AbstractCommand<R> _cmd)`函数给出，所以熔断的逻辑应该就在这里了。
 
