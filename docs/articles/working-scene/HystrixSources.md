@@ -7,7 +7,7 @@
 #### 补充知识点：
 
 - 泛型（generics）。
-- `rxjava-1.2.0.jar`，即[ReactiveX](http://reactivex.io/)技术，是观察者模式（observer pattern）的扩展。有人称之为函数式响应型编程（functional reactive programming），但这是一种误解，在其[简介](http://reactivex.io/intro.html)中就已经进行了澄清。理解RX的[Observable](http://reactivex.io/documentation/observable.html)对理解Hystrix是必不可少的。
+- `rxjava-1.2.0.jar`，即[ReactiveX](http://reactivex.io/)技术，是观察者模式（observer pattern）的扩展。有人称之为函数式响应型编程（functional reactive programming），但这是一种误解，在其[简介](http://reactivex.io/intro.html)中就已经进行了澄清。
 - `/*package*/`注释的作用是作者为了表明自己并非忘记写修饰符（`private/protected/public...`），而是确定使用默认的访问级别，即同一包内可访问（`default`）。
 - `java.util.concurrent.atomic`包，为了保持并发线程下对象操作的原子性。实现方式主要借助`volatile`修饰符，其用法参考[volatile关键字](https://juejin.im/post/5a2b53b7f265da432a7b821c)。
 - 线程池`java.util.concurrent.Executor`。
@@ -172,5 +172,5 @@
 
   从该函数中能够看到，`execution`中保存了执行结果统计，并将统计结果累加到了`initialCountArray`中（因为`initialCountArray`初始值全为0，因此只相当于转移了数据）。
 
-  从上面的分析可以得出，`HealthCountsStream`其实是完成了分割窗口和数据接收的工作，真正的计数是在`execution`中完成的。
+  从上面的分析可以得出，`HealthCountsStream`其实是完成了分割窗口和数据接收的工作，真正的计数工作继续追踪`execution`，发现是存放在了`ExecutionResult`类的内部类`EventCounts`中。
 
