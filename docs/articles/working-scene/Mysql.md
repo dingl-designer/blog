@@ -106,3 +106,59 @@ mysql> alter user 'dinl'@'%' indentified with mysql_native_password by '654321';
 而是想当然的省略了`by '654321'`部分，导致一直连接失败。
 
 上面的两个“想当然”浪费了大量时间。
+
+
+
+#### MySQL数据库隔离级别（isolation level）
+
+[参考文档](https://mydbops.wordpress.com/2018/06/22/back-to-basics-isolation-levels-in-mysql/)
+
+事务（transaction）的四个特性ACID中的I代表隔离性。
+
+隔离定义了Mysql服务器（InnoDB）将每个事务和其他并行执行的食物分离开的方式，并保证多事务以可靠的方式运行。如果事务之间不进行隔离，一个事务可能修改了另一个事务正在读取的数据，因而会发生数据不一致。隔离级别决定了事物之间是如何隔离的。
+
+SQL标准定义的四个隔离级别MySQL全都支持，这四个隔离级别为：
+
+* READ UNCOMMITTED——读未提交
+* READ COMMITTED——读已提交
+* REPEATABLE READ——可重复读
+* SERIALIZABLE——可串行化
+
+根据需求隔离级别可设置为全局或者会话（session）范围。
+
+下面详细介绍每个级别。
+
+##### READ UNCOMMITTED：
+
+在读未提交隔离级别下，事务之前并没有隔离，比如，没有锁。一个事务可以看到另一个事务还未提交的数据修改。这是隔离的最低级别且有很高的性能，因为没有持有锁的开销。在这个隔离水平下，总是会发生脏读（dirty-read）。
+
+这意味着事务甚至可能读到最后根本不存在的数据，因为更新数据的那个事务回退了更新操作且未提交。下面的图帮助我们理解：
+
+<img src="./pics/dirty_read.png" width="50%">
+
+##### READ COMMITTED
+
+在读已提交隔离级别下，避免了脏读的现象，以为任何未提交的更新对其他事务是不可见的。这是大部分流行的RDBMS软件默认的隔离级别，但MySQL不是。
+
+在这个隔离级别下，每一个SELECT操作都使用在其执行之前的已提交数据的快照。现在，因为每次SELECT的操作都有自己的快照，相同的SELECT操作在同一个事务中执行多次（期间其他事务可能提交了数据的更新），可能返回不同的结果集。这个现象称为不可重复读（non-repeatable read）。
+
+<img src="./pics/non_repeatable_read.png" width="50%">
+
+##### REPEATABLE READ
+
+在可重复读隔离级别下，避免了不可重复读的现象。这是MySQL的默认隔离级别。在这样的隔离级别下，同一个事务执行期间同样的SELECT操作执行多次返回同样的结果。
+
+它是这样工作的，
+
+
+
+
+
+
+
+
+
+
+
+
+
