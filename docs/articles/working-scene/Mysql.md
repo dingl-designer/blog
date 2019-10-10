@@ -2,11 +2,9 @@ Ubuntu 18.04 LTS + MySQL 8
 
 
 
-#### MySQL基础知识
+#### 一点预备知识
 
-* 在[下载页](https://www.mysql.com/downloads/)可以看到一些信息，顺便Google下：
-
-  **MySQL的存储引擎**包括InnoDB和MyISAM两种，其中InnoDB支持事物而后者不支持，前者支持行级锁而后者不支持，因此InnoDB比后者更有优势（不仅限于上面两条），MySQL的默认引擎已经从MyISAM变更为InnoDB。
+* **MySQL的存储引擎**包括InnoDB和MyISAM两种，其中InnoDB支持事物而后者不支持，前者支持行级锁而后者不支持，因此InnoDB比后者更有优势（不仅限于上面两条），MySQL的默认引擎已经从MyISAM变更为InnoDB。
 
   **MySQL的连接器**包括JDBC和ODBC（“O”代表“Open”），其中前者使用Java而后者基于C/C++，前者跨平台而后者仅支持Windows，前者有更高的性能，因此在Java环境下强烈建议使用JDBC。
 
@@ -111,7 +109,7 @@ mysql> alter user 'dinl'@'%' indentified with mysql_native_password by '654321';
 
 #### MySQL数据库隔离级别（isolation level）
 
-[参考文档](https://mydbops.wordpress.com/2018/06/22/back-to-basics-isolation-levels-in-mysql/)
+参考文档：[Back to basics: Isolation Levels In MySQL](https://mydbops.wordpress.com/2018/06/22/back-to-basics-isolation-levels-in-mysql/)
 
 事务（transaction）的四个特性ACID中的I代表隔离性。
 
@@ -148,7 +146,19 @@ SQL标准定义的四个隔离级别MySQL全都支持，这四个隔离级别为
 
 在可重复读隔离级别下，避免了不可重复读的现象。这是MySQL的默认隔离级别。在这样的隔离级别下，同一个事务执行期间同样的SELECT操作执行多次返回同样的结果。
 
-它是这样工作的，
+它是这样工作的，在事务期间SELECT第一次执行的时候获取快照，在该事务期间再次执行相同的SELECT时仍旧使用第一次获取的快照。在这样的隔离级别下的事务不会考虑其他事务对数据的修改，无论更新操作是否提交。这保证了读的一致性。维护快照需要额外的开销并影响性能。
+
+尽管这样的隔离级别解决了不可重复读，但带来了另一个问题：幻读（phantom reads）。
+
+幽灵（phantom）是指一行数据出现在了以前不可见的地方。InnoDB和XtraDB使用多版本并发控制（multi-version concurrency control）解决了幻读问题（所以此时可重复读是可靠的隔离级别）。
+
+可重复读是MySQL默认的事务隔离级别。
+
+<img src="./pics/phantom_read.png" width="50%">
+
+##### SERIALIZABLE
+
+可串行化完全隔离的事务对其他事务的影响。这和带有附加限制的可重复读类似，一个事务选择的行不能被其他事务修改直到第一个事务结束。这避免了幻读现象。这个隔离级别是可行的最强的隔离级别。
 
 
 
