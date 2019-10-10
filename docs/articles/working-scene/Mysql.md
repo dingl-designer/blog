@@ -160,13 +160,38 @@ SQL标准定义的四个隔离级别MySQL全都支持，这四个隔离级别为
 
 可串行化完全隔离的事务对其他事务的影响。这和带有附加限制的可重复读类似，一个事务选择的行不能被其他事务修改直到第一个事务结束。这避免了幻读现象。这个隔离级别是可行的最强的隔离级别。
 
+#### 设置隔离级别
 
+8.0版MySQL事务隔离级别设置参考[SET TRANSACTION Syntax](https://dev.mysql.com/doc/refman/8.0/en/set-transaction.html)
 
+```mysql
+SET [GLOBAL | SESSION] TRANSACTION
+    transaction_characteristic [, transaction_characteristic] ...
 
+transaction_characteristic: {
+    ISOLATION LEVEL level
+  | access_mode
+}
 
+level: {
+     REPEATABLE READ
+   | READ COMMITTED
+   | READ UNCOMMITTED
+   | SERIALIZABLE
+}
 
+access_mode: {
+     READ WRITE
+   | READ ONLY
+}
+```
 
+查看隔离级别：
 
+```mysql
+SELECT @@GLOBAL.transaction_isolation, @@GLOBAL.transaction_read_only;
+SELECT @@SESSION.transaction_isolation, @@SESSION.transaction_read_only;
+```
 
 
 
