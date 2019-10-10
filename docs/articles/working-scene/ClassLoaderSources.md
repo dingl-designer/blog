@@ -16,7 +16,7 @@
 
 支持并发加载类文件的类加载器被称为“parallel capable”类加载器，并且要求在类初始化的时候通过调用`ClassLoader.registerAsParallelCapable`进行注册。然而，它的子类如果要获得并行能力需要也注册。
 
-在使用非严格等级制的委托模型的环境中，类加载器需要并行能力，否则类的加载可能引发死锁，因为在类的加载过程中持有加载器锁（详见`loadClass`函数）。
+在使用非严格层级结构的委托模型的环境中，类加载器需要并行能力，否则类的加载可能引发死锁，因为在类的加载过程中持有加载器锁（详见`loadClass`函数）。
 
 通常，JVM从基于平台行为的本地文件系统中加载类文件。比如，在UNIX系统中，JVM从环境变量`CLASSPATH`定义的目录加载类文件。
 
@@ -47,9 +47,27 @@ class NetworkClassLoader extends ClassLoader {
 }
 ```
 
+看完注释代码都懒得再看代码了。
 
+#### 重要的ClassLoader
 
+用idea 看一下`ClassLoader`的继承关系：
 
+<img src="./pics/class_loader.png" width="60%">
+
+*补充一点*：如果使用Oracle发布的JDK，使用idea查看sun包下的class文件关联不到Java源码，只能反编译；但是使用OpenJDK是可以关联上的。
+
+##### BootstrapClassLoader
+
+BootstrapClassLoader是本地的C编写的，所以在上图不体现。
+
+##### URLClassLoader
+
+##### ExtClassLoader
+
+##### AppClassLoader
+
+AppClassLoader的parent属性指向ExtClassLoader对象。
 
 
 
