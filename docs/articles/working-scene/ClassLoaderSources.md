@@ -14,7 +14,7 @@
 
 `ClassLoader`负责加载类。给出一个类的二进制名称，类加载器试图定位或生成构成该类的定义的数据。典型的策略是将名称转换成文件名并从文件系统读取这个class文件。
 
-每一个类对象都包含对定义了当前对象的`ClassLoader`的引用——`getClassLoader()`。*补充*：如果`getClassLoader()`返回null，则该类是由默认的根加载器加载的，这是由于根加载器使用C实现，没有对应的Java类能指向它。
+每一个类对象都包含对定义了当前对象的`ClassLoader`的引用——`getClassLoader()`。*补充*：如果`getClassLoader()`返回null，则该类是由默认的引导类加载器加载的，这是由于引导类加载器使用C实现，没有对应的Java类能指向它。
 
 数组类的类对象不是被类加载器创建的，而是在Java运行时根据需要创建的。数组类的类加载器（`getClassLoader()`的返回值）和它的元素类型的类加载器是一致的。
 
@@ -73,10 +73,10 @@ class NetworkClassLoader extends ClassLoader {
 
 ##### `BootstrapClassLoader`
 
-根加载器是C实现的，在上图不体现，在Java代码中也没有办法引用。所以：
+引导类加载器是C实现的，在上图不体现，在Java代码中也没有办法引用。所以：
 
-* 当一个类的`getClassLoader()`返回null，就表示该类是被根加载器加载的；
-* 当一个类加载器的`parent`属性指向null，那么就是指向了根加载器（比如`ExtClassLoader`）。
+* 当一个类的`getClassLoader()`返回null，就表示该类是被引导类加载器加载的；
+* 当一个类加载器的`parent`属性指向null，那么就是指向了引导类加载器（比如`ExtClassLoader`）。
 
 ##### `URLClassLoader`
 
@@ -84,7 +84,7 @@ class NetworkClassLoader extends ClassLoader {
 
 ##### `ExtClassLoader`
 
-* `ExtClassLoader`的`parent`属性指向null，即根加载器。
+* `ExtClassLoader`的`parent`属性指向null，即引导类加载器。
 
 * `The class loader used for loading installed extensions.`什么是“installed extensions”？根据[Installed Extensions](https://docs.oracle.com/javase/tutorial/ext/basics/install.html)网站的定义：已安装扩展是指JRE软件的`lib/ext`目录下的JAR文件。如下图：
 
@@ -194,9 +194,42 @@ file:/D:/coding-basic/openjdk8/jdk8u222-b10/jre/classes
 
 由此可见，三个类加载器的加载目录是有重叠的，大概就是$Path_{Bootstrap}+Path_{Ext}+Path_{target/classes} \approx Path_{App}$。
 
-那么重叠的部分由谁来完成加载呢？这是由委托模型决定的。注释部分有提及，即每个加载类在尝试加载之前，先请求`parent`属性指向的加载器尝试加载，如果父级加载器加载结果为null，再尝试自己加载。
+那么重叠的部分由谁来完成加载呢？在`ClassLoader`的`loadClass`函数中有如下片段：
 
-所以责任分配为：
+```java
+protected Class<?> loadClass(String name, boolean resolve)
+        throws ClassNotFoundException
+    {
+    //...
+              	try {
+                    if (parent != null) {
+                        c = parent.loadClass(name, false);
+                    } else {
+                        c = findBootstrapClassOrNull(name);
+                    }
+                } catch (ClassNotFoundException e) {
+                    // ClassNotFoundException thrown if class not found
+                    // from the non-null parent class loader
+                }
+
+                if (c == null) {
+                    // If still not found, then invoke findClass in order
+                    // to find the class.
+                    long t1 = System.nanoTime();
+                    c = findClass(name);
+
+                    // this is the defining class loader; record the stats
+                    sun.misc.PerfCounter.getParentDelegationTime().addTime(t1 - t0);
+                    sun.misc.PerfCounter.getFindClassTime().addElapsedTimeFrom(t1);
+                    sun.misc.PerfCounter.getFindClasses().increment();
+                }
+    //...
+}
+```
+
+这段代码成为委托模型。即每个加载器在尝试加载之前，先委托`parent`加载器加载，如果`parent`加载器是null，就让引导类加载器加载（`c = findBootstrapClassOrNull(name);`）。如果`parent`加载器加载失败（`c == null`），再尝试自己加载。
+
+根据委托模型，三个默认加载器的责任分配为：
 
 * `BootstrapClassLoader`负责加载`jre/lib/`目录下的jar包和`jre/classes/`目录下的文件（如果有）；
 * `ExtClassLoader`负责加载`jre/lib/ext/`目录下的jar包；
