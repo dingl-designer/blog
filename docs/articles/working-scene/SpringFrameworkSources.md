@@ -1,4 +1,4 @@
-#### IOC的依赖注入
+#### IOC实现
 
 众所周知，IOC的重要入口，是`AbstractApplicationContext.refresh()`。所以，从这里开始，寻找依赖注入的实现。
 
@@ -137,9 +137,12 @@ Object beanInstance = doCreateBean(beanName, mbdToUse, args);
 
 ```java
 populateBean(beanName, mbd, instanceWrapper);
+if (exposedObject != null) {
+    exposedObject = initializeBean(beanName, exposedObject, mbd);
+}
 ```
 
-`populateBean`函数中：
+其中`populateBean`负责装配（包括将依赖对象准备好），`initializeBean`负责实例化，首先在装配函数`populateBean`：
 
 ```java
 if (mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_NAME ||
@@ -160,7 +163,33 @@ if (mbd.getResolvedAutowireMode() == RootBeanDefinition.AUTOWIRE_BY_NAME ||
 }
 ```
 
-可以看到注入方式有两种，按照名称和类型注入。并且依赖的实例放进了`MutablePropertyValues pvs`中，这个看注释，似乎是给构造器用的。总之，依赖的注入就完成了。
+可以看到注入方式有两种，按照名称和类型注入。并且依赖的实例放进了`MutablePropertyValues pvs`中，供当前类实例化使用。
+
+再看实例化函数`initializeBean`：
+
+```java
+try {
+    invokeInitMethods(beanName, wrappedBean, mbd);
+}
+catch (Throwable ex) {
+    throw new BeanCreationException(
+        (mbd != null ? mbd.getResourceDescription() : null),
+        beanName, "Invocation of init method failed", ex);
+}
+if (mbd == null || !mbd.isSynthetic()) {
+    wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+}
+```
+
+其中`invokeInitMethods`负责初始化类实例。
+
+具体实例化过程，待续。
+
+#### `AOP`实现
+
+[Spring AOP 源码解析](https://www.javadoop.com/post/spring-aop-source)
+
+`applyBeanPostProcessorsAfterInitialization`则是`AOP`实现的入口。
 
 
 
