@@ -1,6 +1,10 @@
-[ISpring Framework Tutorial](https://www.youtube.com/playlist?list=PLw_k9CF7hBpJJsRWAhwSrDlWAzuMV0irl)
+<a href="#t1">Tutorial 1:Spring Framework Tutorial</a>
 
-[教程示例代码](https://github.com/in28minutes/spring-master-class)
+<a href="#t2">Tutorial 2:Spring Framework</a>
+
+
+
+###<a id="t1"> </a>[Spring Framework Tutorial](https://www.youtube.com/playlist?list=PLw_k9CF7hBpJJsRWAhwSrDlWAzuMV0irl)
 
 #### 007 quick introduction to spring framework
 
@@ -31,18 +35,20 @@ application.properties:
 
 #### 035 scope of a bean Prototype and Singleton
 
-default is singleton
-
-four type of beans:
+教程中提到的四种bean scope:
 
 * singleton - one instance per Spring Context
 * prototype - new bean whenever requested
 * request - one bean per http request
 * session - one bean per http session
 
-默认是singleton，指定为prototype的方式为：
+1、Spring bean默认的scope是singleton，指定为prototype的方式为：
 
 `@Scope("portotype")` or `@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)`
+
+2、request和session scope只在web-aware applicationcontext中生效
+
+3、还有一种global session，同样只在web-aware applicationcontext中生效，并且只应用在基于portlet的web程序中
 
 #### 036 complex scope acenarios of a spring bean
 
@@ -92,3 +98,44 @@ or maybe you'll interested in the Spring Core Professional Certification. so che
 
 获取值：`@Value("${propertyname}")`
 
+#### 063 Spring Unit Testing with a Java Context
+
+```java
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes=***.class)	//***.class指向启动类
+```
+
+其中`SpringRunner`和`ContextConfiguration`均位于`spring-test`jar包中。
+
+#### 064 Spring Unit Testing with an XML Context
+
+```java
+@RunWith(SpringRunner.class)
+@ContextConfiguration(locations="/applicationContext.xml")
+```
+
+#### 068 Theory 1 Maven and Magic
+
+开发一个简单的Java web application需要继承HttpServlet，所以引入了jar：
+
+```xml
+<groupId>javax</groupId>
+<artifactId>javaee-web-api</artifactId>
+<scope>provided</scope>
+```
+
+当我在SpringBoot项目中使用HttpServlet时，显示来自tomcat-embed-core.jar包，两者的关系是什么？
+
+Em, too basic. without the background thoeries.
+
+
+
+### <a id="t2"> </a>[Spring Framework](https://www.youtube.com/playlist?list=PLC97BDEFDCDD169D7)
+
+#### 10 Bean Autowiring
+
+`autowire="byType"`适用于该类只有一个实例时，如果有多个实例，使用`autowire="byName"`
+
+#### 11 Understanding Bean Scope
+
+ 
