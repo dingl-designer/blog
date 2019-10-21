@@ -136,6 +136,10 @@ Em, too basic. without the background thoeries.
 
 `autowire="byType"`适用于该类只有一个实例时，如果有多个实例，使用`autowire="byName"`
 
-#### 11 Understanding Bean Scope
+#### 12 Using ApplicationContextAware
+
+任何singleton可以通过实现`ApplicationContextAware, BeanNameAware`接口来获取当前容器和beanName值。
+
+#### 14 Lifecycle Callbacks
 
  
