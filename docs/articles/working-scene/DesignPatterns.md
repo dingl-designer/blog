@@ -18,7 +18,10 @@
 
 具体实现步骤为：1、类内部增加一个私有静态属性（`instance`），用来存储单例；2、向外部提供公共静态函数（`getInstance()`）用于获取单例；3、在`getInstance()`内实现类的延迟初始化，第一次调用时创建新的实例并赋值给`instance`并返回，之后的调用直接返回已创建的`instance`；4、将类的构造函数变为私有（private），只有在类内部才能调用。
 
-*注*：Spring框架也使用单例模式，但是Spring Singleton 不同于此处的Singleton。[Spring Singleton vs Singleton Pattern](https://www.javadevjournal.com/spring/spring-singleton-vs-singleton-pattern/)
+*注*：Spring框架也使用单例模式，但是Spring Singleton scope 不同于此处的Singleton。Spring的singleton scope是指每个容器每个给定的bean id （per container and per bean）创建一个唯一的实例对象。详见：
+
+	* [Spring Singleton vs Singleton Pattern](https://www.javadevjournal.com/spring/spring-singleton-vs-singleton-pattern/) 
+	* [The singleton scope](https://docs.spring.io/spring/docs/4.3.x/spring-framework-reference/html/beans.html#beans-factory-scopes-singleton)
 
 #### Structural Patterns
 
