@@ -2,28 +2,30 @@
 
 <a href="#t2">Tutorial 2:Spring Framework</a>
 
+[Tutorial 3:Spring Framework Reference Documentation](https://docs.spring.io/spring/docs/4.3.x/spring-framework-reference/html/)
 
 
-###<a id="t1"> </a>[Spring Framework Tutorial](https://www.youtube.com/playlist?list=PLw_k9CF7hBpJJsRWAhwSrDlWAzuMV0irl)
+
+### <a id="t1"> </a>[Spring Framework Tutorial](https://www.youtube.com/playlist?list=PLw_k9CF7hBpJJsRWAhwSrDlWAzuMV0irl)
 
 #### 007 quick introduction to spring framework
 
 terminology:
 
-* Beans：Spring中对Class的称呼
+* Beans：Spring中用来表示被容器创建或管理的对象
 * Autowiring：负责感知依赖关系并组装
-* Dependency Injection：将被依赖者注入到依赖者，通过构造器或者set方式
-* Inversion of Control：被依赖bean的创建权由依赖者交给容器
-* IOC Container：即Application Context，负责bean的创建
-* Application Context：Spring 容器
+* Dependency Injection：JSR 330定义的标准，将被依赖者注入到依赖者
+* Inversion of Control：bean的创建权交给容器
+* IOC Container：容器，负责bean的创建和管理
+* Application Context：Spring中的容器，本质上是beanfactory
 
-#### 013 what is happening in the backgroud
+#### 013 what is happening in the background
 
 application.properties:
 
 `logging.level.org.springframework= debug`
 
-以上配置可查看bean初始化日志：search class in ddirectory> identified component> creating instance of bean> autowiring by type from bean .. to bean ..> finished creating instance and so on
+以上配置可查看bean初始化日志：search class in directory> identified component> creating instance of bean> autowiring by type from bean .. to bean ..> finished creating instance and so on
 
  #### 033 Autowiring in Depth by name and @Primary
 
@@ -44,17 +46,25 @@ application.properties:
 
 1、Spring bean默认的scope是singleton，指定为prototype的方式为：
 
-`@Scope("portotype")` or `@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)`
+`@Scope("portotype")` 或 `@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)` 或 `<bean .. scope="prototype"/>`
 
 2、request和session scope只在web-aware applicationcontext中生效
 
-3、还有一种global session，同样只在web-aware applicationcontext中生效，并且只应用在基于portlet的web程序中
+3、教程中未提及的还有三种：global session、application、WebSocket，同样只在web-aware applicationcontext中生效，并且只应用于特定种类的web程序中（比如global session 应用于portlet程序）
 
 #### 036 complex scope acenarios of a spring bean
 
-如果bean A dependent on bean B，并且A是单例模式，B是原型模式，默认情况下每次向A中注入的是同一个B，即B也是单例模式。
+如果bean A dependent on bean B，并且A是单例模式，B是原型模式，因为注入的机会只有一次，就是在实例化A的时候，这导致B也成了单例模式。
 
-通过设置代理`Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE, proxyMode=ScopedProxyMode.TARGET_CLASS)`，可以在每次调用时，向同一个A中注入不同的B。
+为了每次调用B都生成新的bean，有[几种方式](https://docs.spring.io/spring/docs/4.3.x/spring-framework-reference/html/beans.html#beans-factory-scopes-sing-prot-interaction)：
+
+* 教程中给出的方式使用了代理，设置`Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE, proxyMode=ScopedProxyMode.TARGET_CLASS)`；
+
+  这里关于代理的使用，详见[Scoped beans as dependencies](https://docs.spring.io/spring/docs/4.3.x/spring-framework-reference/html/beans.html#beans-factory-scopes-other-injection)
+
+* 每次调用时从`applicationContext`重新获取
+
+* 使用[Lookup method injection](https://docs.spring.io/spring/docs/4.3.x/spring-framework-reference/html/beans.html#beans-factory-lookup-method-injection)（自动生成代码）等等
 
 #### 038 using Component Scan to scan for beans
 
@@ -142,4 +152,6 @@ Em, too basic. without the background thoeries.
 
 #### 14 Lifecycle Callbacks
 
- 
+ 对应tutorial 3 的[Customizing the nature of a bean](https://docs.spring.io/spring/docs/4.3.x/spring-framework-reference/html/beans.html#beans-factory-nature)
+
+先到这，得去准备考试了
