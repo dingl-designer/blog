@@ -16,7 +16,7 @@
 
 
 
-
+枚举素数：
 
 ```java
 private static int end = 1000001;
@@ -28,6 +28,35 @@ private static void init(){
                 primes[j] = 1;
             }
         }
+    }
+}
+```
+
+枚举排列：
+
+```java
+static int N = 9;
+static boolean[] used = new boolean[N+1];
+static int[] result = new int[N+1];
+
+public static void render(int i){
+    if(i > N) {
+        return;
+    }
+    for(int v=0;v<N+1;v++){
+        if(!used[v]) {
+            used[v] = true;
+            result[i] = v;
+            render(i + 1);
+            used[v] = false;
+        }
+    }
+    if (i == N) {
+        StringBuilder sb = new StringBuilder();
+        for(int in : result) {
+            sb.append(in);
+        }
+        System.out.println(new String(sb.toString()));
     }
 }
 ```
