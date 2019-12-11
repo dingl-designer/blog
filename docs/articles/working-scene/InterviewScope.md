@@ -1,8 +1,12 @@
 * JVM
 
-  * 垃圾回收器分类、每种回收器的算法
+  * 垃圾回收
 
     [Understanding Java Garbage Collection](https://www.cubrid.org/blog/understanding-java-garbage-collection)
+    
+    [How to Monitor Java Garbage Collection](https://www.cubrid.org/blog/how-to-monitor-java-garbage-collection)
+    
+    [How to Tune Java Garbage Collection](https://www.cubrid.org/blog/how-to-tune-java-garbage-collection)
 
 * 多线程
 
