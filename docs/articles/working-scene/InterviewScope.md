@@ -43,6 +43,13 @@
   * IOC
   
     [IoC-spring 的灵魂(带你轻松理解IOC思想及bean对象的生成过程)](https://juejin.im/post/593386ca2f301e00584f8036)
-
-
+    
+  * AOP
+  
+    * [JDK Dynamic Proxies](https://www.byteslounge.com/tutorials/jdk-dynamic-proxies)
+    * [字节码增强技术探索](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
+  
+  * SchedulerFactoryBean
+  
+    [spring framework --- 定时任务](https://www.jianshu.com/p/69e44b93bb47)
 
