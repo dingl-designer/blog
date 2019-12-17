@@ -33,6 +33,8 @@
     [深入浅出数据库索引原理](https://zhuanlan.zhihu.com/p/23624390)
     
     [我以为我对Mysql索引很了解，直到我遇到了阿里的面试官](https://juejin.im/post/5de85a66f265da33d21e68b7)
+    
+    [MySQL索引原理及慢查询优化](https://tech.meituan.com/2014/06/30/mysql-index.html)
   
 * Spring
 
@@ -52,4 +54,7 @@
   * SchedulerFactoryBean
   
     [spring framework --- 定时任务](https://www.jianshu.com/p/69e44b93bb47)
+  
+* 性能调优
 
+  [常见性能优化策略的总结](https://tech.meituan.com/2016/12/02/performance-tunning.html)
