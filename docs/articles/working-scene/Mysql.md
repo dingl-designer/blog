@@ -103,17 +103,15 @@ mysql> alter user 'dinl'@'%' indentified with mysql_native_password by '654321';
 
 而是想当然的省略了`by '654321'`部分，导致一直连接失败。
 
-上面的两个“想当然”浪费了大量时间。
-
 
 
 #### MySQL数据库隔离级别（isolation level）
 
 参考文档：[Back to basics: Isolation Levels In MySQL](https://mydbops.wordpress.com/2018/06/22/back-to-basics-isolation-levels-in-mysql/)
 
-事务（transaction）的四个特性ACID中的I代表隔离性。
+事务（transaction）的四个特性ACID中的“I”代表隔离性（isolation）。
 
-隔离定义了Mysql服务器（InnoDB）将每个事务和其他并行执行的食物分离开的方式，并保证多事务以可靠的方式运行。如果事务之间不进行隔离，一个事务可能修改了另一个事务正在读取的数据，因而会发生数据不一致。隔离级别决定了事物之间是如何隔离的。
+隔离定义了Mysql服务器（InnoDB）将每个事务和其他并行执行的食物分离开的方式，并保证多事务以可靠的方式运行。如果事务之间不进行隔离，一个事务可能修改了另一个事务正在读取的数据，因而会发生数据不一致。隔离级别决定了事务之间是如何隔离的。
 
 SQL标准定义的四个隔离级别MySQL全都支持，这四个隔离级别为：
 
