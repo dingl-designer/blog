@@ -58,3 +58,8 @@
 * 性能调优
 
   [常见性能优化策略的总结](https://tech.meituan.com/2016/12/02/performance-tunning.html)
+  
+* Redis
+
+  [Raft算法详解](https://zhuanlan.zhihu.com/p/32052223)
+
