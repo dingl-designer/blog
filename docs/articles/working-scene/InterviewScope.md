@@ -28,8 +28,12 @@
 
     [Back to basics: Isolation Levels In MySQL](https://mydbops.wordpress.com/2018/06/22/back-to-basics-isolation-levels-in-mysql/)（[中文](./Mysql.thml)）
 
-  * 索引
+  * 慢查询
 
+    [MySQL 慢查询日志——让“慢”无所遁形](https://juejin.im/post/58e7415e570c350057c59450)
+  
+  * 索引
+  
     [深入浅出数据库索引原理](https://zhuanlan.zhihu.com/p/23624390)
     
     [我以为我对Mysql索引很了解，直到我遇到了阿里的面试官](https://juejin.im/post/5de85a66f265da33d21e68b7)
