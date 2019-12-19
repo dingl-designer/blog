@@ -62,4 +62,15 @@
 * Redis
 
   [Raft算法详解](https://zhuanlan.zhihu.com/p/32052223)
+  
+  [Redis崩了, 我成功把锅甩给了隔壁组](https://juejin.im/post/5df5d282f265da33c4280d4c)
+  
+* Linux
 
+  [看完这篇Linux基本的操作就会了](https://zhuanlan.zhihu.com/p/36801617)
+  
+* 综合
+
+  [Java3y](https://github.com/ZhongFuCheng3y/3y)
+
+  
