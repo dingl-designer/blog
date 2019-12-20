@@ -21,6 +21,8 @@
   * 锁
 
     [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
+    
+  * [《吊打面试官》系列-ConcurrentHashMap & Hashtable](https://juejin.im/post/5df8d7346fb9a015ff64eaf9)
 
 * Mysql
 
@@ -73,6 +75,10 @@
 
   [看完这篇Linux基本的操作就会了](https://zhuanlan.zhihu.com/p/36801617)
   
+* HTTP
+
+  [面试官，不要再问我三次握手和四次挥手](https://juejin.im/post/5d9c284b518825095879e7a5)
+
 * 综合
 
   [Java3y](https://github.com/ZhongFuCheng3y/3y)
