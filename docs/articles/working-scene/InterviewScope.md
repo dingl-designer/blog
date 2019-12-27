@@ -21,7 +21,10 @@
   * 锁
 
     [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)
-    
+  
+* 重要类
+
+  * [JObject类常用的12个方法](https://juejin.im/post/5db8270e6fb9a0205717ae93)
   * [《吊打面试官》系列-ConcurrentHashMap & Hashtable](https://juejin.im/post/5df8d7346fb9a015ff64eaf9)
 
 * Mysql
@@ -41,6 +44,8 @@
     [我以为我对Mysql索引很了解，直到我遇到了阿里的面试官](https://juejin.im/post/5de85a66f265da33d21e68b7)
     
     [MySQL索引原理及慢查询优化](https://tech.meituan.com/2014/06/30/mysql-index.html)
+    
+    [SQL语句优化、mysql不走索引的原因、数据库索引的设计原则](https://www.cnblogs.com/95lyj/p/9343544.html)
   
 * Spring
 
@@ -78,6 +83,10 @@
 * HTTP
 
   [面试官，不要再问我三次握手和四次挥手](https://juejin.im/post/5d9c284b518825095879e7a5)
+
+  [请求头]
+
+  [请求类型]
 
 * 综合
 
