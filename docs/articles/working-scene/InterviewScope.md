@@ -1,4 +1,4 @@
-* JVM内存模型及垃圾回收（滴滴）
+* JVM内存结构（非内存模型）及垃圾回收（滴滴）
 
   * Become a Java GC Expert
 
