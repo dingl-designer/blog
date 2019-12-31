@@ -74,6 +74,8 @@
   
   [Redis崩了, 我成功把锅甩给了隔壁组](https://juejin.im/post/5df5d282f265da33c4280d4c)
   
+  [Redis集群的原理和搭建](https://www.jianshu.com/p/c869feb5581d) 或 [Redis集群的原理和搭建](https://juejin.im/entry/596343056fb9a06bc340ac15)
+  
 * Linux（字节跳动）
 
   [看完这篇Linux基本的操作就会了](https://zhuanlan.zhihu.com/p/36801617)
@@ -88,9 +90,14 @@
 
   [第三部分：Idea重构总结](https://segmentfault.com/a/1190000011451192)
 
-* 综合
+* 综合（系列）
 
   [Java3y](https://github.com/ZhongFuCheng3y/3y)
+  
+  [《吊打面试官》系列-秒杀系统设计](https://juejin.im/post/5dd09f5af265da0be72aacbd)
+  
+* 编码
 
+  [字符，字符集，字符编码](https://www.jianshu.com/p/bd7a6c508c33)
 
-
+  
