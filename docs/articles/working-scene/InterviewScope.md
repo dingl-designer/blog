@@ -96,6 +96,8 @@
   
   [《吊打面试官》系列-秒杀系统设计](https://juejin.im/post/5dd09f5af265da0be72aacbd)
   
+  [**马士兵教育**](https://mashibing.com/article_java.html#a) （最近在腾讯课堂试看了一些课程，主要是沽泡学院和马士兵教育（比如马士兵的《简明JDBC教程》），马士兵的课气场更足一些。顺便访问了一下马士兵教育官网，有比较系统的知识框架，大概可以秒杀我之前总结的其他星星点点的知识点）
+  
 * 编码
 
   [字符，字符集，字符编码](https://www.jianshu.com/p/bd7a6c508c33)
