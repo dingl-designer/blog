@@ -45,6 +45,10 @@
     
     [SQL语句优化、mysql不走索引的原因、数据库索引的设计原则](https://www.cnblogs.com/95lyj/p/9343544.html)
   
+* Sharding-JDBC
+
+  [ShardingSphere 概览](https://shardingsphere.apache.org/document/current/cn/overview/)
+
 * Spring
 
   * SpringMVC（滴滴）
@@ -80,15 +84,29 @@
 
   [看完这篇Linux基本的操作就会了](https://zhuanlan.zhihu.com/p/36801617)
   
-* 协议
+* 通信协议
 
   [面试官，不要再问我三次握手和四次挥手](https://juejin.im/post/5d9c284b518825095879e7a5)
 
   [HTTP请求类型]（联想）
 
+  [WebService就是这么简单](https://juejin.im/post/5aadae4bf265da238a303917#comment)
+
 * IDE（华为）
 
   [第三部分：Idea重构总结](https://segmentfault.com/a/1190000011451192)
+
+* Cookie vs Session（字节跳动）
+
+  [细说分布式Session管理](https://www.jianshu.com/p/3dd4e06bdfa4)
+
+* 设计模式（海康威视）
+
+  [Singleton(单例)](https://mashibing.com/article_load.html?../resources/java/单例.html)
+
+* 编码
+
+  [字符，字符集，字符编码](https://www.jianshu.com/p/bd7a6c508c33)
 
 * 综合（系列）
 
@@ -98,8 +116,4 @@
   
   [**马士兵教育**](https://mashibing.com/article_java.html#a) 「最近在腾讯课堂试看了一些课程，主要是沽泡学院和马士兵教育（比如马士兵的免费的《简明JDBC教程》《Java日志框架-SLF4J入门》《马士兵Java零基础入门》），相较之下，马士兵的课更透彻、气场更足，而且对于我这种工作多年的人来说，依旧能汲取到很多有用的东西。」
   
-* 编码
-
-  [字符，字符集，字符编码](https://www.jianshu.com/p/bd7a6c508c33)
-
   
