@@ -19,11 +19,16 @@
   * 锁
 
     [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)（字节跳动）
+    
+  * 生产者、消费者
   
-* 重要类
+    [生产者--消费者问题](https://juejin.im/post/5aeec675f265da0b7c072c56)
+  
+* Java重要类/特性
 
   * [JObject类常用的12个方法](https://juejin.im/post/5db8270e6fb9a0205717ae93)（字节跳动）
   * [《吊打面试官》系列-ConcurrentHashMap & Hashtable](https://juejin.im/post/5df8d7346fb9a015ff64eaf9)（联想）
+  * [Java8新特性，你应该了解这些](https://juejin.im/post/5ae6bfb66fb9a07a9b35bac1)（阿里）
 
 * Mysql
 
@@ -44,6 +49,8 @@
     [MySQL索引原理及慢查询优化](https://tech.meituan.com/2014/06/30/mysql-index.html)
     
     [SQL语句优化、mysql不走索引的原因、数据库索引的设计原则](https://www.cnblogs.com/95lyj/p/9343544.html)
+    
+  * [MySQL命令，一篇文章替你全部搞定](https://juejin.im/post/5ae55861f265da0ba062ec71)（没人问）
   
 * Sharding-JDBC
 
@@ -63,6 +70,7 @@
   
     * [JDK Dynamic Proxies](https://www.byteslounge.com/tutorials/jdk-dynamic-proxies)
     * [字节码增强技术探索](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
+    * [使用Jedis整合Redis实现缓存（AOP）](https://cloud.tencent.com/developer/article/1383500)
   
   * SchedulerFactoryBean
   
