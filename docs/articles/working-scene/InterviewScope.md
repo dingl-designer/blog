@@ -16,13 +16,17 @@
 
     [深入理解线程池原理篇](https://juejin.im/post/5c8896be5188257ec828072f)（海康威视）
 
-  * 锁
+    [java线程池工作队列饱和策略代码示例](http://www.word666.com/ruanjian/156664.html)（小桔科技）
 
+  * 锁
+  
     [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)（字节跳动）
     
-  * 生产者、消费者
+  * Queue
   
-    [生产者--消费者问题](https://juejin.im/post/5aeec675f265da0b7c072c56)
+    [生产者--消费者问题](https://juejin.im/post/5aeec675f265da0b7c072c56)（华为）
+    
+    [阻塞队列与非阻塞队列](https://cloud.tencent.com/developer/article/1446683)（小桔科技）
   
 * Java重要类/特性
 
@@ -58,19 +62,19 @@
 
 * Spring
 
-  * SpringMVC（滴滴）
+  * SpringMVC
 
-    [SpringMVC入门就这么简单](https://juejin.im/post/5aaa67edf265da238f124762)
+    [SpringMVC入门就这么简单](https://juejin.im/post/5aaa67edf265da238f124762)（滴滴）
     
-  * IOC（滴滴）
+  * IOC
   
-    [IoC-spring 的灵魂(带你轻松理解IOC思想及bean对象的生成过程)](https://juejin.im/post/593386ca2f301e00584f8036)
+    [IoC-spring 的灵魂(带你轻松理解IOC思想及bean对象的生成过程)](https://juejin.im/post/593386ca2f301e00584f8036)（滴滴）
     
   * AOP
   
     * [JDK Dynamic Proxies](https://www.byteslounge.com/tutorials/jdk-dynamic-proxies)
     * [字节码增强技术探索](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
-    * [使用Jedis整合Redis实现缓存（AOP）](https://cloud.tencent.com/developer/article/1383500)
+    * [使用Jedis整合Redis实现缓存（AOP）](https://cloud.tencent.com/developer/article/1383500)（阿里）
   
   * SchedulerFactoryBean
   
@@ -80,13 +84,15 @@
 
   [常见性能优化策略的总结](https://tech.meituan.com/2016/12/02/performance-tunning.html)
   
-* Redis（贝壳找房）
+* Redis
 
+  [通俗易懂的Redis数据结构基础教程](https://juejin.im/post/5b53ee7e5188251aaa2d2e16)（小桔科技）
+  
   [Raft算法详解](https://zhuanlan.zhihu.com/p/32052223)
   
   [Redis崩了, 我成功把锅甩给了隔壁组](https://juejin.im/post/5df5d282f265da33c4280d4c)
   
-  [Redis集群的原理和搭建](https://www.jianshu.com/p/c869feb5581d) 或 [Redis集群的原理和搭建](https://juejin.im/entry/596343056fb9a06bc340ac15)
+  [Redis集群的原理和搭建](https://juejin.im/entry/596343056fb9a06bc340ac15)（贝壳找房）
   
 * Linux（字节跳动）
 
