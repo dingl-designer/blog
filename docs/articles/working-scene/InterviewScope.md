@@ -22,12 +22,19 @@
   
     [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)（字节跳动）
     
+    [多线程栅栏-CountDownLatch、CyclicBarrier](https://juejin.im/post/5aeec3ebf265da0ba76fa327)
+    
   * Queue
   
     [生产者--消费者问题](https://juejin.im/post/5aeec675f265da0b7c072c56)（华为）
     
     [阻塞队列与非阻塞队列](https://cloud.tencent.com/developer/article/1446683)（小桔科技）
   
+* IO
+
+  * [NIO中的易筋经及**NIO相关基础篇一二三**](https://www.cnblogs.com/jiangxinlingdu/p/8191064.html)
+  * [深入剖析Linux IO原理和几种零拷贝机制的实现](https://zhuanlan.zhihu.com/p/83398714)
+
 * Java重要类/特性
 
   * [JObject类常用的12个方法](https://juejin.im/post/5db8270e6fb9a0205717ae93)（字节跳动）
@@ -54,7 +61,7 @@
     
     [SQL语句优化、mysql不走索引的原因、数据库索引的设计原则](https://www.cnblogs.com/95lyj/p/9343544.html)
     
-  * [MySQL命令，一篇文章替你全部搞定](https://juejin.im/post/5ae55861f265da0ba062ec71)（没人问）
+  * [MySQL命令，一篇文章替你全部搞定](https://juejin.im/post/5ae55861f265da0ba062ec71)
   
 * Sharding-JDBC
 
@@ -102,7 +109,7 @@
 
   [面试官，不要再问我三次握手和四次挥手](https://juejin.im/post/5d9c284b518825095879e7a5)
 
-  [HTTP请求类型]（联想）
+  [HTTP请求类型](HTTP权威指南（中文版）)（联想）
 
   [WebService就是这么简单](https://juejin.im/post/5aadae4bf265da238a303917#comment)
 
