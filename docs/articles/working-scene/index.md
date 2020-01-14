@@ -10,7 +10,7 @@
 
 #### [设计模式](./DesignPatterns.html)
 
-#### [Ubuntu 安装 MySQL 8](./Mysql.html)
+#### [Ubuntu 安装配置 MySQL 8，隔离级别](./Mysql.html)
 
 #### [SpringBoot + MyBatis](./SpringBoot.html)
 
